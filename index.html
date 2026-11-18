@@ -228,6 +228,16 @@ small{font-size:.78rem;color:var(--t2);}
 .mt8{margin-top:8px;}.mt12{margin-top:12px;}.mt16{margin-top:16px;}.mb8{margin-bottom:8px;}.mb12{margin-bottom:12px;}.mb16{margin-bottom:16px;}
 .w-full{width:100%;}.tsm{font-size:.85rem;}.tmut{color:var(--t2);}.tc{text-align:center;}.fnum{font-variant-numeric:tabular-nums;}.bold{font-weight:700;}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+
+/* ══ AUTH ══ */
+.auth-tab{flex:1;padding:8px;border:none;border-radius:9px;background:transparent;color:var(--t2);font-family:var(--fb);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.auth-tab.on{background:var(--s1);color:var(--t);box-shadow:0 1px 6px rgba(0,0,0,.2);}
+.auth-err{padding:8px 12px;background:var(--er2);border-radius:var(--r8);color:var(--er);font-size:.82rem;line-height:1.5;margin-top:2px;}
+.sync-ind{width:8px;height:8px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .3s;}
+.sync-ind.syncing{background:var(--wa);animation:pulse .9s infinite;}
+.sync-ind.synced{background:var(--ok);}
+.sync-ind.serr{background:var(--er);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
 </style>
 
 <!-- SPLASH -->
@@ -251,11 +261,44 @@ small{font-size:.78rem;color:var(--t2);}
   </div>
 </div>
 
+<!-- AUTH -->
+<div id="auth-s" hidden>
+  <div class="ws-logo">💪</div>
+  <h1 class="ws-title">CORPUS</h1>
+  <p class="ws-sub">Tu compañero de entrenamiento</p>
+  <div class="ws-card">
+    <div style="display:flex;background:var(--s2);border-radius:var(--r12);padding:3px;margin-bottom:16px;" id="auth-tabs">
+      <button class="auth-tab on" data-at="login">Iniciar sesión</button>
+      <button class="auth-tab" data-at="register">Crear cuenta</button>
+    </div>
+    <div id="auth-login-panel">
+      <div class="flex fc gap12">
+        <div class="fg"><label class="fl">Email</label><input type="email" id="auth-email" placeholder="tu@email.com" autocomplete="email" style="margin-top:4px;"></div>
+        <div class="fg"><label class="fl">Contraseña</label><input type="password" id="auth-pass" placeholder="••••••••" autocomplete="current-password" style="margin-top:4px;"></div>
+        <div id="auth-err1" class="auth-err" hidden></div>
+        <button class="btn btn-p btn-full" id="btn-auth-login" style="font-family:var(--ff);font-size:1rem;font-weight:700;">Entrar →</button>
+      </div>
+    </div>
+    <div id="auth-reg-panel" hidden>
+      <div class="flex fc gap12">
+        <div class="fg"><label class="fl">Nombre</label><input type="text" id="auth-name" placeholder="Tu nombre" maxlength="30" autocomplete="given-name" style="margin-top:4px;"></div>
+        <div class="fg"><label class="fl">Email</label><input type="email" id="auth-email2" placeholder="tu@email.com" autocomplete="email" style="margin-top:4px;"></div>
+        <div class="fg"><label class="fl">Contraseña</label><input type="password" id="auth-pass2" placeholder="Mín. 6 caracteres" autocomplete="new-password" style="margin-top:4px;"></div>
+        <div id="auth-err2" class="auth-err" hidden></div>
+        <button class="btn btn-p btn-full" id="btn-auth-reg" style="font-family:var(--ff);font-size:1rem;font-weight:700;">Crear cuenta →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- APP -->
 <div id="app" hidden>
   <header class="phdr">
     <div class="phdr-title">A entrenar, <span class="hl" id="hdr-user">—</span></div>
-    <div id="hdr-actions"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="sync-ind" id="sync-ind" title="Sincronización en la nube"></div>
+      <div id="hdr-actions"></div>
+    </div>
   </header>
 
   <div id="mc-wrap">
@@ -379,6 +422,12 @@ small{font-size:.78rem;color:var(--t2);}
         </div>
 
         <div class="card mb16">
+          <div class="card-title mb8">Cuenta</div>
+          <p class="tsm tmut mb12" id="set-email" style="word-break:break-all;">—</p>
+          <button class="btn btn-d btn-sm" id="btn-signout">Cerrar sesión</button>
+        </div>
+
+        <div class="card mb16">
           <div class="card-title mb8">Recordatorios push</div>
           <p class="tsm tmut mb12">Recibe recordatorios para entrenar directamente en tu iPhone.</p>
           <div id="ios-warn" hidden style="background:var(--wa2);border:1px solid var(--wa);border-radius:var(--r8);padding:10px 12px;margin-bottom:12px;font-size:.82rem;color:var(--wa);">⚠️ Añade a pantalla de inicio primero: <strong>Compartir → Añadir a pantalla de inicio</strong></div>
@@ -443,6 +492,9 @@ small{font-size:.78rem;color:var(--t2);}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
 
 <script>
 /* ═══ 1. CONSTANTES ═══ */
@@ -471,21 +523,60 @@ const DEFAULT_EX=[
   {id:'e19',name:'Plancha',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Crunch abdominal','Rueda abdominal']},
 ];
 
+/* ═══ 1b. FIREBASE INIT ═══ */
+firebase.initializeApp({apiKey:"AIzaSyALRwoikYarHPJzrGge2lWp40IFNTJGyUQ",authDomain:"corpus-app-c1e31.firebaseapp.com",projectId:"corpus-app-c1e31",storageBucket:"corpus-app-c1e31.firebasestorage.app",messagingSenderId:"297085911377",appId:"1:297085911377:web:cbe73dfa070bb334c31370"});
+const auth=firebase.auth();
+const db=firebase.firestore();
+
 /* ═══ 2. STORE ═══ */
 const S={
   get(k,d=null){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch{return d;}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}},
 };
+let _noSync=false;
 const getUser=()=>S.get('gym_user','');
-const setUser=n=>S.set('gym_user',n);
+const setUser=n=>{S.set('gym_user',n);if(!_noSync)schedSync();};
 const getEx=()=>S.get('gym_exercises',null);
-const setEx=ex=>S.set('gym_exercises',ex);
+const setEx=ex=>{S.set('gym_exercises',ex);if(!_noSync)schedSync();};
 const getSess=()=>S.get('gym_sessions',[]);
-const setSess=s=>S.set('gym_sessions',s);
+const setSess=s=>{S.set('gym_sessions',s);if(!_noSync)schedSync();};
 const getRoutines=()=>S.get('gym_routines',[]);
-const setRoutines=r=>S.set('gym_routines',r);
+const setRoutines=r=>{S.set('gym_routines',r);if(!_noSync)schedSync();};
 const getTheme=()=>S.get('gym_theme','dark');
 const saveTheme=t=>S.set('gym_theme',t);
+
+/* ═══ 2b. FIREBASE SYNC ═══ */
+let _syncTimer=null;
+function setSyncState(s){const el=document.getElementById('sync-ind');if(el)el.className='sync-ind'+(s?' '+s:'');}
+function schedSync(){
+  clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(async()=>{
+    if(!auth.currentUser)return;
+    setSyncState('syncing');
+    try{
+      await db.collection('users').doc(auth.currentUser.uid).set({name:getUser(),exercises:getEx()||DEFAULT_EX,sessions:getSess(),routines:getRoutines(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+      setSyncState('synced');setTimeout(()=>setSyncState(''),3000);
+    }catch(e){console.warn('Sync:',e);setSyncState('serr');}
+  },1500);
+}
+async function loadFromFS(uid){
+  try{
+    const doc=await db.collection('users').doc(uid).get();
+    if(doc.exists){
+      const d=doc.data();_noSync=true;
+      if(d.name)S.set('gym_user',d.name);
+      if(d.exercises?.length)S.set('gym_exercises',d.exercises);
+      if(d.sessions?.length)S.set('gym_sessions',d.sessions);
+      if(d.routines?.length)S.set('gym_routines',d.routines);
+      _noSync=false;return true;
+    }
+  }catch(e){console.warn('Load:',e);}
+  _noSync=false;return false;
+}
+async function migrateLocalToFS(uid){
+  const local={name:S.get('gym_user',''),exercises:S.get('gym_exercises',null)||DEFAULT_EX,sessions:S.get('gym_sessions',[]),routines:S.get('gym_routines',[])};
+  try{await db.collection('users').doc(uid).set({...local,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});}catch(e){console.warn('Migrate:',e);}
+}
 
 /* ═══ 3. UTILS ═══ */
 let _uc=0;
@@ -542,13 +633,15 @@ function renderTab(tab){
   else if(tab==='settings')renderSettings();
 }
 
-/* ═══ 8. BIENVENIDA ═══ */
+/* ═══ 8. BIENVENIDA + AUTH ═══ */
 function doWelcome(){
-  try{const inp=document.getElementById('ws-name');const name=(inp?inp.value:'').trim();if(!name){if(inp)inp.focus();return;}setUser(name);if(!getEx())setEx(DEFAULT_EX);launchApp(name);}catch(e){console.error(e);}
+  try{const inp=document.getElementById('ws-name');const name=(inp?inp.value:'').trim();if(!name){if(inp)inp.focus();return;}_noSync=true;S.set('gym_user',name);if(!getEx())S.set('gym_exercises',DEFAULT_EX);_noSync=false;launchApp(name);}catch(e){console.error(e);}
 }
 function launchApp(name){
-  if(!getEx())setEx(DEFAULT_EX);
-  document.getElementById('ws').hidden=true;document.getElementById('app').hidden=false;
+  _noSync=true;if(!getEx())S.set('gym_exercises',DEFAULT_EX);_noSync=false;
+  document.getElementById('ws').hidden=true;
+  document.getElementById('auth-s').hidden=true;
+  document.getElementById('app').hidden=false;
   document.getElementById('hdr-user').textContent=name;
   document.getElementById('session-date').value=today();
   document.getElementById('set-name').value=name;
@@ -556,21 +649,74 @@ function launchApp(name){
 }
 function hideSplash(){
   const sp=document.getElementById('splash');if(!sp)return;
-  sp.classList.add('out');
-  setTimeout(()=>{sp.remove();},480);
+  sp.classList.add('out');setTimeout(()=>{sp.remove();},480);
 }
+let _authHInit=false;
+function showAuthScreen(){
+  const el=document.getElementById('auth-s');if(!el)return;
+  el.hidden=false;
+  ['auth-email','auth-pass','auth-email2','auth-pass2','auth-name'].forEach(id=>{const i=document.getElementById(id);if(i)i.value='';});
+  ['auth-err1','auth-err2'].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=true;});
+  if(!_authHInit){_authHInit=true;initAuthHandlers();}
+  setTimeout(()=>document.getElementById('auth-email')?.focus(),200);
+}
+function initAuthHandlers(){
+  document.querySelectorAll('.auth-tab').forEach(btn=>btn.addEventListener('click',()=>{
+    const at=btn.dataset.at;
+    document.querySelectorAll('.auth-tab').forEach(b=>b.classList.toggle('on',b.dataset.at===at));
+    document.getElementById('auth-login-panel').hidden=at!=='login';
+    document.getElementById('auth-reg-panel').hidden=at!=='register';
+    setTimeout(()=>document.getElementById(at==='login'?'auth-email':'auth-name')?.focus(),80);
+  }));
+  const authErrMsgs={'auth/user-not-found':'No existe una cuenta con ese email.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Email o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera un momento.','auth/email-already-in-use':'Ya existe una cuenta con ese email.','auth/invalid-email':'Email inválido.','auth/weak-password':'Contraseña demasiado débil (mín. 6 caracteres).'};
+  const doLogin=async()=>{
+    const email=document.getElementById('auth-email').value.trim();const pass=document.getElementById('auth-pass').value;
+    const errEl=document.getElementById('auth-err1');
+    if(!email||!pass){errEl.textContent='Completa todos los campos.';errEl.hidden=false;return;}
+    errEl.hidden=true;const btn=document.getElementById('btn-auth-login');btn.textContent='Entrando…';btn.disabled=true;
+    try{await auth.signInWithEmailAndPassword(email,pass);}
+    catch(e){btn.textContent='Entrar →';btn.disabled=false;errEl.textContent=authErrMsgs[e.code]||'Error al iniciar sesión.';errEl.hidden=false;}
+  };
+  document.getElementById('btn-auth-login').addEventListener('click',doLogin);
+  document.getElementById('auth-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  const doRegister=async()=>{
+    const name=document.getElementById('auth-name').value.trim();const email=document.getElementById('auth-email2').value.trim();const pass=document.getElementById('auth-pass2').value;
+    const errEl=document.getElementById('auth-err2');
+    if(!name||!email||!pass){errEl.textContent='Completa todos los campos.';errEl.hidden=false;return;}
+    if(pass.length<6){errEl.textContent='La contraseña debe tener mínimo 6 caracteres.';errEl.hidden=false;return;}
+    errEl.hidden=true;const btn=document.getElementById('btn-auth-reg');btn.textContent='Creando…';btn.disabled=true;
+    try{
+      const cred=await auth.createUserWithEmailAndPassword(email,pass);
+      const existingS=S.get('gym_sessions',[]);const existingR=S.get('gym_routines',[]);const existingE=S.get('gym_exercises',null);
+      const dataToSave={name,exercises:existingE||DEFAULT_EX,sessions:existingS,routines:existingR,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+      _noSync=true;S.set('gym_user',name);if(!existingE)S.set('gym_exercises',DEFAULT_EX);_noSync=false;
+      await db.collection('users').doc(cred.user.uid).set(dataToSave);
+    }catch(e){btn.textContent='Crear cuenta →';btn.disabled=false;errEl.textContent=authErrMsgs[e.code]||'Error al crear la cuenta.';errEl.hidden=false;}
+  };
+  document.getElementById('btn-auth-reg').addEventListener('click',doRegister);
+  document.getElementById('auth-pass2').addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
+}
+let _booted=false;
 function boot(){
   applyTheme(getTheme());
-  const name=getUser();
-  setTimeout(()=>{
-    hideSplash();
-    if(!name){
-      document.getElementById('ws').hidden=false;
-      document.getElementById('ws-btn').addEventListener('click',doWelcome);
-      const inp=document.getElementById('ws-name');
-      if(inp){inp.addEventListener('keydown',e=>{if(e.key==='Enter')doWelcome();});setTimeout(()=>inp.focus(),200);}
-    }else launchApp(name);
-  },950);
+  auth.onAuthStateChanged(async user=>{
+    if(!_booted){
+      _booted=true;
+      await new Promise(r=>setTimeout(r,950));
+      hideSplash();
+    }
+    if(user){
+      const hasData=await loadFromFS(user.uid);
+      if(!hasData)await migrateLocalToFS(user.uid);
+      const name=getUser()||user.email.split('@')[0];
+      if(!getUser()){_noSync=true;S.set('gym_user',name);_noSync=false;}
+      document.getElementById('app').hidden=false;
+      launchApp(name);
+    }else{
+      document.getElementById('app').hidden=true;
+      showAuthScreen();
+    }
+  });
 }
 
 /* ═══ 9. EJERCICIOS ═══ */
@@ -926,6 +1072,16 @@ function renderSettings(){
   document.getElementById('set-name').value=getUser();
   const t=getTheme();document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('on',b.dataset.th===t));
   checkIOSPWA();refreshNotifStatus();
+  const emailEl=document.getElementById('set-email');if(emailEl&&auth.currentUser)emailEl.textContent=auth.currentUser.email;
+  const soBtn=document.getElementById('btn-signout');
+  if(soBtn&&!soBtn._init){soBtn._init=true;soBtn.onclick=()=>confirmAction('¿Cerrar sesión? Tus datos están guardados en la nube.',async()=>{
+    await auth.signOut();
+    clearTimeout(_syncTimer);_noSync=true;
+    S.set('gym_user','');S.set('gym_sessions',[]);S.set('gym_routines',[]);S.set('gym_exercises',null);
+    _noSync=false;activeSession={exercises:[]};_authHInit=false;
+    document.getElementById('app').hidden=true;
+    showAuthScreen();
+  });}
 }
 document.getElementById('btn-save-name').addEventListener('click',()=>{
   const v=document.getElementById('set-name').value.trim();if(!v)return;
