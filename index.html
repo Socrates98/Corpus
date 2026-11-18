@@ -69,7 +69,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .phdr{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--b);padding:calc(12px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) 12px max(20px,env(safe-area-inset-left,0px));display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .phdr-title{font-family:var(--ff);font-size:1.05rem;font-weight:700;line-height:1.1;}
 .phdr-title .hl{color:var(--at);}
-#mc-wrap{flex:1;overflow-y:auto;min-height:0;}
+#mc-wrap{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;}
 .inner{padding:0 max(20px,env(safe-area-inset-left,0px)) calc(var(--nh)+env(safe-area-inset-bottom,0px)+32px);}
 .tab{display:none;padding-top:24px;}
 .tab.on{display:block;}
@@ -151,6 +151,11 @@ small{font-size:.78rem;color:var(--t2);}
 .set-inp:focus{border-color:var(--a);}
 .sets-tbl tbody tr:focus-within{background:rgba(201,247,49,.05);}
 .sets-tbl tbody tr:focus-within .set-inp{border-color:var(--a);}
+.sets-tbl th.col-active{color:var(--a)!important;}
+.ico-btn[data-dset],.ico-btn[data-dex]{color:rgba(248,113,113,.5);}
+.ico-btn[data-dset]:hover,.ico-btn[data-dex]:hover{color:var(--er);}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) invert(1);opacity:.5;cursor:pointer;}
+:root[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator{filter:none;opacity:.6;}
 .set-acts{display:flex;gap:5px;align-items:center;}
 .sex-add{padding:12px 16px;display:flex;gap:10px;align-items:center;border-top:1px solid var(--b);}
 
@@ -165,7 +170,7 @@ small{font-size:.78rem;color:var(--t2);}
 .day-ex{font-size:.75rem;color:var(--t2);margin-top:2px;}
 
 /* ══ EX FILTER ══ */
-#ex-filter{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;}
+#ex-filter{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none;touch-action:pan-x;}
 #ex-filter::-webkit-scrollbar{display:none;}
 .fchip{padding:6px 14px;border-radius:100px;border:none;cursor:pointer;font-size:.74rem;font-weight:600;white-space:nowrap;font-family:var(--fb);transition:background .15s,color .15s;flex-shrink:0;}
 
@@ -376,7 +381,7 @@ small{font-size:.78rem;color:var(--t2);}
         </div>
         <div id="sess-list">
           <div class="empty">
-            <div class="empty-icon"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="1.4" stroke-linecap="round"><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><line x1="6" y1="12" x2="18" y2="12"/><rect x="8" y="7" width="2" height="10" rx="1"/><rect x="14" y="7" width="2" height="10" rx="1"/></svg></div>
+            <div class="empty-icon" style="opacity:.12;filter:blur(2px);"><div style="width:72px;height:72px;border-radius:22px;background:var(--a);display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin:0 auto;">💪</div></div>
             <div class="empty-t">Sin ejercicios</div>
             <p class="empty-s">Pulsa <strong>+ Ejercicio</strong> o carga una rutina</p>
           </div>
@@ -506,19 +511,6 @@ small{font-size:.78rem;color:var(--t2);}
           </div>
         </div>
 
-        <div class="card mb16">
-          <div class="card-title mb8">Copia de seguridad</div>
-          <p class="tsm tmut mb12">Exporta o importa todos tus datos en JSON.</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-s btn-sm" id="btn-export">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar JSON
-            </button>
-            <label class="btn btn-g btn-sm" style="cursor:pointer;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Importar
-              <input type="file" id="import-file" accept=".json" hidden>
-            </label>
-          </div>
-        </div>
 
         <div class="card">
           <div class="card-title mb8">Acerca de</div>
@@ -613,7 +605,7 @@ const getRoutines=()=>S.get('gym_routines',[]);
 const setRoutines=r=>{S.set('gym_routines',r);if(!_noSync)schedSync();};
 const getTheme=()=>S.get('gym_theme','dark');
 const saveTheme=t=>S.set('gym_theme',t);
-const getShowRIR=()=>S.get('gym_rir',false);
+const getShowRIR=()=>S.get('gym_rir',true);
 const setShowRIR=v=>S.set('gym_rir',v);
 
 /* ═══ 2b. FIREBASE SYNC ═══ */
@@ -967,7 +959,7 @@ let activeSession={exercises:[]};
 function renderSession(){
   const container=document.getElementById('sess-list'),footer=document.getElementById('sess-footer');
   if(!activeSession.exercises.length){
-    container.innerHTML=`<div class="empty"><div class="empty-icon"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="1.4" stroke-linecap="round"><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><line x1="6" y1="12" x2="18" y2="12"/><rect x="8" y="7" width="2" height="10" rx="1"/><rect x="14" y="7" width="2" height="10" rx="1"/></svg></div><div class="empty-t">Sin ejercicios</div><p class="empty-s">Pulsa <strong>+ Ejercicio</strong> o carga una rutina</p></div>`;
+    container.innerHTML=`<div class="empty"><div class="empty-icon" style="opacity:.12;filter:blur(2px);"><div style="width:72px;height:72px;border-radius:22px;background:var(--a);display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin:0 auto;">💪</div></div><div class="empty-t">Sin ejercicios</div><p class="empty-s">Pulsa <strong>+ Ejercicio</strong> o carga una rutina</p></div>`;
     footer.hidden=true;return;
   }
   footer.hidden=false;
@@ -976,10 +968,10 @@ function renderSession(){
     const ex=getExById(se.exerciseId)||{name:se.exerciseName,group:'?',material:'?',videoUrl:''};
     const vurl=ex.videoUrl||`https://www.youtube.com/results?search_query=${encodeURIComponent(se.exerciseName+' técnica')}`;
     const inpW=showRIR?'width:58px;':'';
-    const rows=se.sets.map((s,si)=>`<tr><td><span class="set-n">${si+1}</span></td><td><input type="number" class="set-inp" min="0" max="999" step="0.5" value="${s.weight||''}" placeholder="0" data-xi="${xi}" data-si="${si}" data-f="weight" style="${inpW}"></td><td><input type="number" class="set-inp" min="1" max="999" step="1" value="${s.reps||''}" placeholder="0" data-xi="${xi}" data-si="${si}" data-f="reps" style="${inpW}"></td>${showRIR?`<td><input type="number" class="set-inp" min="0" max="10" step="1" value="${s.rir!=null?s.rir:''}" placeholder="—" data-xi="${xi}" data-si="${si}" data-f="rir" style="width:50px;"></td>`:''}<td><div class="set-acts"><button class="ico-btn" data-rpt="${xi}-${si}" style="font-size:.75rem;" title="Repetir">↻</button><button class="ico-btn" data-dset="${xi}-${si}" style="font-size:.75rem;">✕</button></div></td></tr>`).join('');
-    return`<div class="sex-card"><div class="sex-hdr"><button class="drag-handle" title="Mover">⠿</button><div class="sex-name">${esc(se.exerciseName)}${se.isSub?` <span class="sub-badge">Sust.</span>`:''}</div><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:6px 11px;min-height:34px;font-size:.78rem;">▶</a><button class="btn btn-w btn-sm" data-sub="${xi}" style="padding:6px 11px;min-height:34px;font-size:.78rem;">No puedo</button><button class="ico-btn" data-dex="${xi}" style="font-size:.8rem;">✕</button></div><div style="overflow-x:auto;"><table class="sets-tbl"><thead><tr><th>#</th><th>Kg</th><th>Reps</th>${showRIR?'<th style="color:var(--ok);">RIR</th>':''}<th></th></tr></thead><tbody>${rows}</tbody></table></div><div class="sex-add"><button class="btn btn-s btn-sm" data-aset="${xi}" style="flex:1;">+ Serie</button><input type="text" placeholder="Notas..." id="snotes-${xi}" value="${esc(se.notes||'')}" style="flex:2;font-size:1rem;min-height:38px;padding:8px 10px;background:var(--s3);border-radius:var(--r8);border:1px solid transparent;color:var(--t);outline:none;touch-action:manipulation;" /></div></div>`;
+    const rows=se.sets.map((s,si)=>`<tr><td><input type="number" class="set-inp" min="0" max="999" step="0.5" value="${s.weight||''}" placeholder="0" data-xi="${xi}" data-si="${si}" data-f="weight" style="${inpW}"></td><td><input type="number" class="set-inp" min="1" max="999" step="1" value="${s.reps||''}" placeholder="0" data-xi="${xi}" data-si="${si}" data-f="reps" style="${inpW}"></td>${showRIR?`<td><input type="number" class="set-inp" min="0" max="10" step="1" value="${s.rir!=null?s.rir:''}" placeholder="—" data-xi="${xi}" data-si="${si}" data-f="rir" style="width:50px;"></td>`:''}<td><div class="set-acts"><button class="ico-btn" data-rpt="${xi}-${si}" style="font-size:.75rem;" title="Repetir">↻</button><button class="ico-btn" data-dset="${xi}-${si}" style="font-size:.75rem;">✕</button></div></td></tr>`).join('');
+    return`<div class="sex-card"><div class="sex-hdr"><button class="drag-handle" title="Mover">⠿</button><div class="sex-name">${esc(se.exerciseName)}${se.isSub?` <span class="sub-badge">Sust.</span>`:''}</div><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:6px 11px;min-height:34px;font-size:.78rem;">▶</a><button class="btn btn-w btn-sm" data-sub="${xi}" style="padding:6px 11px;min-height:34px;font-size:.78rem;">No puedo</button><button class="ico-btn" data-dex="${xi}" style="font-size:.8rem;">✕</button></div><div style="overflow-x:auto;"><table class="sets-tbl"><thead><tr><th>Kg</th><th>Reps</th>${showRIR?'<th style="color:var(--ok);">RIR</th>':''}<th></th></tr></thead><tbody>${rows}</tbody></table></div><div class="sex-add"><button class="btn btn-s btn-sm" data-aset="${xi}" style="flex:1;">+ Serie</button><input type="text" placeholder="Notas..." id="snotes-${xi}" value="${esc(se.notes||'')}" style="flex:2;font-size:1rem;min-height:38px;padding:8px 10px;background:var(--s3);border-radius:var(--r8);border:1px solid transparent;color:var(--t);outline:none;touch-action:manipulation;" /></div></div>`;
   }).join('');
-  container.querySelectorAll('[data-f]').forEach(inp=>{const h=e=>{const xi=+e.target.dataset.xi,si=+e.target.dataset.si,f=e.target.dataset.f;const v=e.target.value;activeSession.exercises[xi].sets[si][f]=f==='rir'?(v===''?null:parseInt(v)):parseFloat(v)||0;};inp.addEventListener('input',h);inp.addEventListener('change',h);});
+  container.querySelectorAll('[data-f]').forEach(inp=>{const h=e=>{const xi=+e.target.dataset.xi,si=+e.target.dataset.si,f=e.target.dataset.f;const v=e.target.value;activeSession.exercises[xi].sets[si][f]=f==='rir'?(v===''?null:parseInt(v)):parseFloat(v)||0;};inp.addEventListener('input',h);inp.addEventListener('change',h);inp.addEventListener('focus',e=>{const td=e.target.closest('td');const colIdx=td?[...td.parentElement.children].indexOf(td):-1;const tbl=e.target.closest('table');if(tbl&&colIdx>=0)tbl.querySelectorAll('thead th').forEach((th,i)=>th.classList.toggle('col-active',i===colIdx));});inp.addEventListener('blur',e=>{const tbl=e.target.closest('table');if(tbl)tbl.querySelectorAll('thead th').forEach(th=>th.classList.remove('col-active'));});});
   container.querySelectorAll('[data-aset]').forEach(btn=>btn.addEventListener('click',e=>{const xi=+e.target.dataset.aset;const last=activeSession.exercises[xi].sets.at(-1)||{weight:0,reps:0,rir:null,notes:''};activeSession.exercises[xi].sets.push({weight:last.weight,reps:last.reps,rir:null,notes:''});renderSession();}));
   container.querySelectorAll('[data-rpt]').forEach(btn=>btn.addEventListener('click',e=>{const[xi,si]=e.target.dataset.rpt.split('-').map(Number);activeSession.exercises[xi].sets.push({...activeSession.exercises[xi].sets[si]});renderSession();}));
   container.querySelectorAll('[data-dset]').forEach(btn=>btn.addEventListener('click',e=>{const[xi,si]=e.target.dataset.dset.split('-').map(Number);activeSession.exercises[xi].sets.splice(si,1);if(!activeSession.exercises[xi].sets.length)activeSession.exercises[xi].sets.push({weight:0,reps:0,notes:''});renderSession();}));
