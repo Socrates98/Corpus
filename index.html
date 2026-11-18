@@ -125,7 +125,7 @@ small{font-size:.78rem;color:var(--t2);}
 /* ══ MODAL ══ */
 #mo{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;}
 #mo.on{display:flex;}
-.m-box{background:var(--s1);border-radius:var(--r20) var(--r20) 0 0;width:100%;max-width:600px;max-height:92svh;overflow-y:auto;padding:24px max(20px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));animation:slideUp .22s cubic-bezier(.32,.72,0,1);}
+.m-box{background:var(--s1);border-radius:var(--r20) var(--r20) 0 0;width:100%;max-width:600px;max-height:92svh;overflow-y:auto;padding:24px max(20px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));animation:slideUp .22s cubic-bezier(.32,.72,0,1);transition:margin-bottom .2s;}
 .m-box::before{content:"";display:block;width:36px;height:4px;border-radius:4px;background:var(--s3);margin:0 auto 20px;}
 @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
@@ -985,5 +985,14 @@ function confirmAction(msg,onYes){
 }
 
 /* ═══ 19. BOOT ═══ */
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/Corpus/sw.js',{scope:'/Corpus/'}).catch(()=>{});}
+// Subir modal cuando el teclado iOS cubre el contenido
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',()=>{
+    const mb=document.querySelector('.m-box');if(!mb)return;
+    const offset=Math.max(0,window.innerHeight-window.visualViewport.height-window.visualViewport.offsetTop);
+    mb.style.marginBottom=offset?offset+'px':'';
+  });
+}
 document.addEventListener('DOMContentLoaded',()=>{document.getElementById('session-date').value=today();boot();});
 </script>
