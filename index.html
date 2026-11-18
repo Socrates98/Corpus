@@ -1198,17 +1198,6 @@ document.getElementById('btn-save-name').addEventListener('click',()=>{
   setUser(v);document.getElementById('hdr-user').textContent=v;toast('Nombre actualizado','ok');
 });
 
-/* ═══ 16. BACKUP ═══ */
-document.getElementById('btn-export').addEventListener('click',()=>{
-  const data={version:2,exportDate:new Date().toISOString(),user:getUser(),exercises:getEx()||DEFAULT_EX,sessions:getSess(),routines:getRoutines()};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`corpus-${today()}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);toast('Exportado','ok');
-});
-document.getElementById('import-file').addEventListener('change',e=>{
-  const file=e.target.files[0];if(!file)return;const reader=new FileReader();
-  reader.onload=ev=>{try{const data=JSON.parse(ev.target.result);if(!data.exercises||!data.sessions)throw new Error();confirmAction('¿Importar datos? Se sobreescribirán los actuales.',()=>{if(data.user){setUser(data.user);document.getElementById('hdr-user').textContent=data.user;}setEx(data.exercises);setSess(data.sessions);if(data.routines)setRoutines(data.routines);toast('Datos importados','ok');renderTab(curTab);});}catch{toast('Archivo inválido','err');}};
-  reader.readAsText(file);e.target.value='';
-});
 
 /* ═══ 17. NOTIFICACIONES ═══ */
 function checkIOSPWA(){const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);document.getElementById('ios-warn').hidden=!(ios&&window.navigator.standalone!==true);}
