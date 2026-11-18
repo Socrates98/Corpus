@@ -134,7 +134,11 @@ small{font-size:.78rem;color:var(--t2);}
 
 /* ══ SESION ══ */
 .sess-top{display:flex;align-items:center;gap:8px;margin-bottom:22px;flex-wrap:wrap;}
+#sess-list{margin-bottom:76px;}
 #sess-footer{position:sticky;bottom:calc(var(--nh) + env(safe-area-inset-bottom,0px) + 8px);padding-top:8px;z-index:5;}
+.drag-handle{cursor:grab;padding:2px 8px 2px 0;color:var(--t3);font-size:1.3rem;line-height:1;user-select:none;touch-action:none;flex-shrink:0;background:none;border:none;}
+.drag-handle:active{cursor:grabbing;}
+.sortable-ghost{opacity:.35;background:var(--s3)!important;}
 .sex-card{background:var(--s1);border:1px solid var(--b);border-radius:var(--r16);margin-bottom:16px;overflow:hidden;}
 .sex-hdr{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--s2);}
 .sex-name{flex:1;font-family:var(--ff);font-weight:700;font-size:.95rem;min-width:0;}
@@ -552,6 +556,7 @@ small{font-size:.78rem;color:var(--t2);}
 <div id="mo"><div class="m-box" id="m-inner"></div></div>
 <div id="toast-c"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.3/Sortable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -972,7 +977,7 @@ function renderSession(){
     const vurl=ex.videoUrl||`https://www.youtube.com/results?search_query=${encodeURIComponent(se.exerciseName+' técnica')}`;
     const inpW=showRIR?'width:58px;':'';
     const rows=se.sets.map((s,si)=>`<tr><td><span class="set-n">${si+1}</span></td><td><input type="number" class="set-inp" min="0" max="999" step="0.5" value="${s.weight||''}" placeholder="0" data-xi="${xi}" data-si="${si}" data-f="weight" style="${inpW}"></td><td><input type="number" class="set-inp" min="1" max="999" step="1" value="${s.reps||''}" placeholder="0" data-xi="${xi}" data-si="${si}" data-f="reps" style="${inpW}"></td>${showRIR?`<td><input type="number" class="set-inp" min="0" max="10" step="1" value="${s.rir!=null?s.rir:''}" placeholder="—" data-xi="${xi}" data-si="${si}" data-f="rir" style="width:50px;"></td>`:''}<td><div class="set-acts"><button class="ico-btn" data-rpt="${xi}-${si}" style="font-size:.75rem;" title="Repetir">↻</button><button class="ico-btn" data-dset="${xi}-${si}" style="font-size:.75rem;">✕</button></div></td></tr>`).join('');
-    return`<div class="sex-card"><div class="sex-hdr"><div class="sex-name">${esc(se.exerciseName)}${se.isSub?` <span class="sub-badge">Sust.</span>`:''}</div><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:6px 11px;min-height:34px;font-size:.78rem;">▶</a><button class="btn btn-w btn-sm" data-sub="${xi}" style="padding:6px 11px;min-height:34px;font-size:.78rem;">No puedo</button><button class="ico-btn" data-dex="${xi}" style="font-size:.8rem;">✕</button></div><div style="overflow-x:auto;"><table class="sets-tbl"><thead><tr><th>#</th><th>Kg</th><th>Reps</th>${showRIR?'<th style="color:var(--ok);">RIR</th>':''}<th></th></tr></thead><tbody>${rows}</tbody></table></div><div class="sex-add"><button class="btn btn-s btn-sm" data-aset="${xi}" style="flex:1;">+ Serie</button><input type="text" placeholder="Notas..." id="snotes-${xi}" value="${esc(se.notes||'')}" style="flex:2;font-size:1rem;min-height:38px;padding:8px 10px;background:var(--s3);border-radius:var(--r8);border:1px solid transparent;color:var(--t);outline:none;touch-action:manipulation;" /></div></div>`;
+    return`<div class="sex-card"><div class="sex-hdr"><button class="drag-handle" title="Mover">⠿</button><div class="sex-name">${esc(se.exerciseName)}${se.isSub?` <span class="sub-badge">Sust.</span>`:''}</div><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:6px 11px;min-height:34px;font-size:.78rem;">▶</a><button class="btn btn-w btn-sm" data-sub="${xi}" style="padding:6px 11px;min-height:34px;font-size:.78rem;">No puedo</button><button class="ico-btn" data-dex="${xi}" style="font-size:.8rem;">✕</button></div><div style="overflow-x:auto;"><table class="sets-tbl"><thead><tr><th>#</th><th>Kg</th><th>Reps</th>${showRIR?'<th style="color:var(--ok);">RIR</th>':''}<th></th></tr></thead><tbody>${rows}</tbody></table></div><div class="sex-add"><button class="btn btn-s btn-sm" data-aset="${xi}" style="flex:1;">+ Serie</button><input type="text" placeholder="Notas..." id="snotes-${xi}" value="${esc(se.notes||'')}" style="flex:2;font-size:1rem;min-height:38px;padding:8px 10px;background:var(--s3);border-radius:var(--r8);border:1px solid transparent;color:var(--t);outline:none;touch-action:manipulation;" /></div></div>`;
   }).join('');
   container.querySelectorAll('[data-f]').forEach(inp=>{const h=e=>{const xi=+e.target.dataset.xi,si=+e.target.dataset.si,f=e.target.dataset.f;const v=e.target.value;activeSession.exercises[xi].sets[si][f]=f==='rir'?(v===''?null:parseInt(v)):parseFloat(v)||0;};inp.addEventListener('input',h);inp.addEventListener('change',h);});
   container.querySelectorAll('[data-aset]').forEach(btn=>btn.addEventListener('click',e=>{const xi=+e.target.dataset.aset;const last=activeSession.exercises[xi].sets.at(-1)||{weight:0,reps:0,rir:null,notes:''};activeSession.exercises[xi].sets.push({weight:last.weight,reps:last.reps,rir:null,notes:''});renderSession();}));
@@ -981,6 +986,11 @@ function renderSession(){
   container.querySelectorAll('[data-dex]').forEach(btn=>btn.addEventListener('click',e=>{activeSession.exercises.splice(+e.target.dataset.dex,1);renderSession();}));
   container.querySelectorAll('[data-sub]').forEach(btn=>btn.addEventListener('click',e=>showSubModal(+e.target.dataset.sub)));
   container.querySelectorAll('[id^="snotes-"]').forEach(inp=>inp.addEventListener('input',e=>{activeSession.exercises[+e.target.id.replace('snotes-','')].notes=e.target.value;}));
+  if(typeof Sortable!=='undefined'){
+    Sortable.create(container,{handle:'.drag-handle',animation:180,ghostClass:'sortable-ghost',delay:120,delayOnTouchOnly:true,
+      onEnd:evt=>{if(evt.oldIndex===evt.newIndex)return;const m=activeSession.exercises.splice(evt.oldIndex,1)[0];activeSession.exercises.splice(evt.newIndex,0,m);renderSession();}
+    });
+  }
 }
 document.getElementById('btn-add-ex').addEventListener('click',()=>{
   const exercises=getEx()||DEFAULT_EX;const groups=[...new Set(exercises.map(e=>e.group))];
