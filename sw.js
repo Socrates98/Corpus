@@ -1,4 +1,4 @@
-const CACHE = 'corpus-v8';
+const CACHE = 'corpus-v9';
 const ASSETS = ['/', '/index.html', '/manifest.json', '/assets/icon-180.png', '/assets/icon-192.png', '/assets/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -11,10 +11,10 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  const isNav = e.request.mode === 'navigate';
   e.respondWith(
-    fetch(e.request).then(res => {
-      const clone = res.clone();
-      caches.open(CACHE).then(c => c.put(e.request, clone));
+    fetch(e.request, isNav ? {cache:'no-cache'} : undefined).then(res => {
+      if (!isNav) { const clone=res.clone(); caches.open(CACHE).then(c=>c.put(e.request,clone)); }
       return res;
     }).catch(() => caches.match(e.request))
   );
