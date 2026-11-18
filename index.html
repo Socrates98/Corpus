@@ -209,12 +209,24 @@ small{font-size:.78rem;color:var(--t2);}
 .empty-s{font-size:.85rem;color:var(--t2);}
 
 /* ══ SPLASH ══ */
-#splash{position:fixed;inset:0;z-index:9999;background:#0c0c0d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .45s ease,transform .45s ease;}
-#splash.out{opacity:0;transform:scale(1.05);pointer-events:none;}
-.splash-ic{width:88px;height:88px;background:var(--a);border-radius:22px;display:flex;align-items:center;justify-content:center;font-family:var(--ff);font-weight:900;font-size:3rem;color:var(--af);animation:sp-in .5s cubic-bezier(.34,1.56,.64,1) both;}
-.splash-wm{font-family:var(--ff);font-weight:800;font-size:1.35rem;letter-spacing:.22em;color:#f0f0f2;animation:sp-in .5s .08s cubic-bezier(.34,1.56,.64,1) both;}
-.splash-sub{font-family:var(--fb);font-size:.78rem;color:#6e6e7a;letter-spacing:.05em;animation:sp-in .4s .18s ease both;}
-@keyframes sp-in{from{opacity:0;transform:scale(.8) translateY(8px);}to{opacity:1;transform:none;}}
+#splash{position:fixed;inset:0;z-index:9999;background:#0c0c0d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .45s ease,transform .45s ease;}
+#splash.out{opacity:0;transform:scale(1.06);pointer-events:none;}
+#sp-anim{position:relative;display:flex;align-items:center;justify-content:center;min-height:92px;}
+.sp-logo{position:absolute;top:50%;left:50%;margin:-44px 0 0 -44px;width:88px;height:88px;background:var(--a);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;box-shadow:0 0 56px rgba(201,247,49,.35);animation:sp-logo-pop .5s 1.42s cubic-bezier(.34,1.56,.64,1) both;}
+#sp-word{display:flex;align-items:center;font-family:var(--ff);font-weight:800;font-size:clamp(3.2rem,15vw,5rem);color:#f0f0f2;letter-spacing:.06em;}
+.sp-l{display:inline-block;overflow:hidden;}
+.sp-c{animation:sp-l-in .4s 0s cubic-bezier(.34,1.56,.64,1) both,sp-c-out .28s 1.36s ease-in forwards;}
+.sp-o{animation:sp-l-in .4s .06s cubic-bezier(.34,1.56,.64,1) both,sp-l-out .2s 1.27s ease-in forwards;}
+.sp-r{animation:sp-l-in .4s .12s cubic-bezier(.34,1.56,.64,1) both,sp-l-out .2s 1.10s ease-in forwards;}
+.sp-p{animation:sp-l-in .4s .18s cubic-bezier(.34,1.56,.64,1) both,sp-l-out .2s .93s ease-in forwards;}
+.sp-u{animation:sp-l-in .4s .24s cubic-bezier(.34,1.56,.64,1) both,sp-l-out .2s .76s ease-in forwards;}
+.sp-s{animation:sp-l-in .4s .30s cubic-bezier(.34,1.56,.64,1) both,sp-l-out .2s .62s ease-in forwards;}
+@keyframes sp-l-in{from{opacity:0;transform:translateY(16px);max-width:0;}to{opacity:1;transform:none;max-width:1.5em;}}
+@keyframes sp-l-out{from{opacity:1;transform:none;max-width:1.5em;}to{opacity:0;transform:translateY(-10px);max-width:0;}}
+@keyframes sp-c-out{from{opacity:1;transform:none;}to{opacity:0;transform:scale(.7);}}
+@keyframes sp-logo-pop{from{opacity:0;transform:scale(.3);}to{opacity:1;transform:scale(1);}}
+#sp-sub{font-family:var(--fb);font-size:.78rem;color:#6e6e7a;letter-spacing:.05em;animation:sp-sub-in .4s 1.68s ease both;}
+@keyframes sp-sub-in{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
 
 /* ══ TOAST ══ */
 #toast-c{position:fixed;top:calc(env(safe-area-inset-top,0px)+14px);left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none;align-items:center;}
@@ -260,9 +272,18 @@ small{font-size:.78rem;color:var(--t2);}
 
 <!-- SPLASH -->
 <div id="splash" aria-hidden="true">
-  <div class="splash-ic">C</div>
-  <div class="splash-wm">CORPUS</div>
-  <div class="splash-sub">Tu compañero de entrenamiento</div>
+  <div id="sp-anim">
+    <div class="sp-logo">💪</div>
+    <div id="sp-word">
+      <span class="sp-l sp-c">C</span>
+      <span class="sp-l sp-o">O</span>
+      <span class="sp-l sp-r">R</span>
+      <span class="sp-l sp-p">P</span>
+      <span class="sp-l sp-u">U</span>
+      <span class="sp-l sp-s">S</span>
+    </div>
+  </div>
+  <div id="sp-sub">Tu compañero de entrenamiento</div>
 </div>
 
 <!-- BIENVENIDA -->
@@ -779,7 +800,7 @@ function boot(){
   auth.onAuthStateChanged(async user=>{
     if(!_booted){
       _booted=true;
-      await new Promise(r=>setTimeout(r,950));
+      await new Promise(r=>setTimeout(r,2000));
       hideSplash();
     }
     if(user){
