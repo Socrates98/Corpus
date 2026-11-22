@@ -151,8 +151,8 @@ small{font-size:.78rem;color:var(--t2);}
 .sets-tbl tbody tr:focus-within{background:rgba(201,247,49,.05);}
 .sets-tbl tbody tr:focus-within .set-inp{border-color:var(--a);}
 .sets-tbl th.col-active{color:var(--a)!important;}
-.ico-btn[data-dset],.ico-btn[data-dex]{color:rgba(248,113,113,.5);}
-.ico-btn[data-dset]:hover,.ico-btn[data-dex]:hover{color:var(--er);}
+.ico-btn[data-dset],.ico-btn[data-dex],#mc-x{color:rgba(248,113,113,.5);}
+.ico-btn[data-dset]:hover,.ico-btn[data-dex]:hover,#mc-x:hover{color:var(--er);}
 .step-btn{background:var(--s3);border:none;cursor:pointer;color:var(--t2);width:28px;height:28px;border-radius:6px;font-size:1rem;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;touch-action:manipulation;user-select:none;}
 .step-btn:active{background:var(--b2);color:var(--t);}
 input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
@@ -227,13 +227,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
 #splash{position:fixed;inset:0;z-index:9999;background:#0c0c0d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .45s ease,transform .45s ease;}
 #splash.out{opacity:0;transform:scale(1.06);pointer-events:none;}
 #sp-anim{position:relative;display:flex;align-items:center;justify-content:center;min-height:92px;}
-.sp-logo{position:absolute;top:50%;left:50%;margin:-44px 0 0 -44px;width:88px;height:88px;background:var(--a);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;box-shadow:0 0 56px rgba(201,247,49,.35);animation:sp-logo-pop .5s 1.42s cubic-bezier(.34,1.56,.64,1) both;}
-#sp-word{position:relative;font-family:var(--ff);font-weight:800;font-size:clamp(3.2rem,15vw,5rem);color:#f0f0f2;letter-spacing:.06em;animation:sp-l-in .4s cubic-bezier(.34,1.56,.64,1) both,sp-word-out .22s 1.38s ease forwards;}
-#sp-word::after{content:'';position:absolute;top:-20%;bottom:-20%;right:0;left:100%;background:linear-gradient(to right,transparent,#0c0c0d 1.4em);animation:sp-wipe .72s .55s ease-out forwards;pointer-events:none;}
+#sp-word{font-family:var(--ff);font-weight:800;font-size:clamp(3.2rem,15vw,5rem);color:#f0f0f2;letter-spacing:.06em;animation:sp-l-in .4s cubic-bezier(.34,1.56,.64,1) both;white-space:nowrap;position:relative;z-index:1;}
+#sp-c{display:inline-block;}
+#sp-rest{display:inline-block;animation:sp-rest-out .3s .85s ease forwards;}
 @keyframes sp-l-in{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
-@keyframes sp-wipe{from{left:100%;}to{left:13%;}}
-@keyframes sp-word-out{to{opacity:0;}}
-@keyframes sp-logo-pop{from{opacity:0;transform:scale(.3);}to{opacity:1;transform:scale(1);}}
+@keyframes sp-rest-out{to{opacity:0;}}
+#sp-icon{position:absolute;top:50%;left:50%;width:88px;height:88px;border-radius:22px;box-shadow:0 0 56px rgba(201,247,49,.35);transform:translate(-50%,-50%) scale(0.3);opacity:0;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s ease;object-fit:cover;}
 #sp-sub{font-family:var(--fb);font-size:.78rem;color:#6e6e7a;letter-spacing:.05em;animation:sp-sub-in .4s 1.68s ease both;}
 @keyframes sp-sub-in{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
 
@@ -282,8 +281,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
 <!-- SPLASH -->
 <div id="splash" aria-hidden="true">
   <div id="sp-anim">
-    <div class="sp-logo">💪</div>
-    <div id="sp-word">CORPUS</div>
+    <img id="sp-icon" src="assets/icon-192.png" alt="">
+    <div id="sp-word"><span id="sp-c">C</span><span id="sp-rest">ORPUS</span></div>
   </div>
   <div id="sp-sub">Tu compañero de entrenamiento</div>
 </div>
@@ -384,7 +383,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
         </div>
         <div id="sess-list">
           <div class="empty">
-            <div class="empty-icon" style="opacity:.12;filter:blur(2px);"><div style="width:72px;height:72px;border-radius:22px;background:var(--a);display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin:0 auto;">💪</div></div>
+            <div class="empty-icon" style="opacity:.15;filter:blur(2px);"><img src="assets/icon-192.png" style="width:72px;height:72px;border-radius:22px;object-fit:cover;display:block;margin:0 auto;"></div>
             <div class="empty-t">Sin ejercicios</div>
             <p class="empty-s">Pulsa <strong>+ Ejercicio</strong> o carga una rutina</p>
           </div>
@@ -686,8 +685,14 @@ function toast(msg,type=''){
 /* ═══ 6. MODAL ═══ */
 let _mcb=null;
 function openModal(html,onClose){document.getElementById('m-inner').innerHTML=html;document.getElementById('mo').classList.add('on');_mcb=onClose||null;}
-function closeModal(){document.getElementById('mo').classList.remove('on');if(_mcb){_mcb();_mcb=null;}}
+function closeModal(){const box=document.getElementById('m-inner');document.getElementById('mo').classList.remove('on');box.style.transform='';box.style.transition='';if(_mcb){_mcb();_mcb=null;}}
 document.getElementById('mo').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+// Swipe-down to dismiss
+(function(){const box=document.getElementById('m-inner');let sy=0,cy=0,act=false;
+box.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const ty=e.touches[0].clientY;if(box.scrollTop===0||ty-box.getBoundingClientRect().top<44){sy=ty;cy=ty;act=true;box.style.transition='none';}},{passive:true});
+box.addEventListener('touchmove',e=>{if(!act)return;cy=e.touches[0].clientY;const dy=Math.max(0,cy-sy);if(dy>0)box.style.transform=`translateY(${dy}px)`;},{passive:true});
+box.addEventListener('touchend',()=>{if(!act)return;act=false;if(cy-sy>90){box.style.transition='transform .25s cubic-bezier(.32,.72,0,1)';box.style.transform='translateY(110%)';setTimeout(()=>closeModal(),230);}else{box.style.transition='transform .2s cubic-bezier(.32,.72,0,1)';box.style.transform='';box.addEventListener('transitionend',()=>{box.style.transition='';},{once:true});}});
+})();
 
 /* ═══ 7. NAV ═══ */
 let curTab='session',exFilter='all',exSeg='ex-panel',progSeg='by-ex';
@@ -962,7 +967,7 @@ let activeSession={exercises:[]};
 function renderSession(){
   const container=document.getElementById('sess-list'),footer=document.getElementById('sess-footer');
   if(!activeSession.exercises.length){
-    container.innerHTML=`<div class="empty"><div class="empty-icon" style="opacity:.12;filter:blur(2px);"><div style="width:72px;height:72px;border-radius:22px;background:var(--a);display:flex;align-items:center;justify-content:center;font-size:2.4rem;margin:0 auto;">💪</div></div><div class="empty-t">Sin ejercicios</div><p class="empty-s">Pulsa <strong>+ Ejercicio</strong> o carga una rutina</p></div>`;
+    container.innerHTML=`<div class="empty"><div class="empty-icon" style="opacity:.15;filter:blur(2px);"><img src="assets/icon-192.png" style="width:72px;height:72px;border-radius:22px;object-fit:cover;display:block;margin:0 auto;"></div><div class="empty-t">Sin ejercicios</div><p class="empty-s">Pulsa <strong>+ Ejercicio</strong> o carga una rutina</p></div>`;
     container.style.paddingBottom='0';footer.hidden=true;return;
   }
   footer.hidden=false;
@@ -1255,4 +1260,24 @@ if(window.visualViewport){
   });
 }
 document.addEventListener('DOMContentLoaded',()=>{document.getElementById('session-date').value=today();boot();});
+// Splash C → logo animation
+(function(){
+  const spC=document.getElementById('sp-c');
+  const spAnim=document.getElementById('sp-anim');
+  const spIcon=document.getElementById('sp-icon');
+  if(!spC||!spAnim||!spIcon)return;
+  setTimeout(()=>{
+    const cRect=spC.getBoundingClientRect();
+    const aRect=spAnim.getBoundingClientRect();
+    const dx=(aRect.left+aRect.width/2)-(cRect.left+cRect.width/2);
+    spC.style.transition='transform .45s cubic-bezier(.34,1.56,.64,1)';
+    spC.style.transform=`translateX(${dx}px)`;
+  },1100);
+  setTimeout(()=>{
+    spC.style.transition+= ',opacity .25s ease';
+    spC.style.opacity='0';
+    spIcon.style.transform='translate(-50%,-50%) scale(1)';
+    spIcon.style.opacity='1';
+  },1550);
+})();
 </script>
