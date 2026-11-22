@@ -1,5 +1,5 @@
-const CACHE = 'corpus-v20';
-const ASSETS = ['/', '/index.html', '/manifest.json', '/assets/icon-180.png', '/assets/icon-192.png', '/assets/icon-512.png'];
+const CACHE = 'corpus-v21';
+const ASSETS = ['/', '/index.html', '/manifest.json', '/privacy.html', '/assets/icon-180.png', '/assets/icon-192.png', '/assets/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

@@ -320,6 +320,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
           <input class="auth-inp" type="password" id="auth-pass" placeholder="contraseña" autocomplete="current-password">
         </div>
         <div id="auth-err1" class="auth-err" hidden></div>
+        <div style="text-align:right;margin-top:-6px;"><button class="auth-link" id="btn-forgot" style="font-size:.8rem;">¿Olvidaste tu contraseña?</button></div>
         <button class="btn btn-p btn-full" id="btn-auth-login" style="font-family:var(--ff);font-size:1rem;font-weight:700;min-height:52px;border-radius:var(--r12);">Iniciar sesión</button>
         <div class="auth-sep"><span>o</span></div>
         <button class="auth-google-btn" id="btn-google1">
@@ -327,6 +328,20 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
           Continuar con Google
         </button>
         <p class="auth-switch">¿Sin cuenta? <button class="auth-link" id="btn-to-reg">Crear una →</button></p>
+      </div>
+    </div>
+
+    <!-- FORGOT PASSWORD PANEL -->
+    <div id="auth-forgot-panel" hidden>
+      <div class="flex fc" style="gap:14px;">
+        <p style="font-size:.88rem;color:var(--t2);text-align:center;line-height:1.5;">Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
+        <div class="auth-inp-wrap">
+          <svg class="auth-inp-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+          <input class="auth-inp" type="email" id="forgot-email" placeholder="correo electrónico" autocomplete="email">
+        </div>
+        <div id="auth-err-forgot" class="auth-err" hidden></div>
+        <button class="btn btn-p btn-full" id="btn-send-reset" style="font-family:var(--ff);font-size:1rem;font-weight:700;min-height:52px;border-radius:var(--r12);">Enviar email</button>
+        <p class="auth-switch"><button class="auth-link" id="btn-forgot-back">← Volver al inicio de sesión</button></p>
       </div>
     </div>
 
@@ -516,7 +531,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
 
         <div class="card">
           <div class="card-title mb8">Acerca de</div>
-          <p class="tsm tmut">Corpus — historial de entrenamiento local en tu dispositivo.</p>
+          <p class="tsm tmut mb12">Corpus — tu compañero de entrenamiento.</p>
+          <a href="privacy.html" target="_blank" rel="noopener" style="font-size:.82rem;color:var(--t2);text-decoration:none;display:inline-flex;align-items:center;gap:4px;">Política de privacidad <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
         </div>
       </section>
 
@@ -558,6 +574,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics-compat.js"></script>
 
 <script>
 /* ═══ 1. CONSTANTES ═══ */
@@ -665,9 +682,12 @@ const DEFAULT_EX=[
 ];
 
 /* ═══ 1b. FIREBASE INIT ═══ */
-firebase.initializeApp({apiKey:"AIzaSyALRwoikYarHPJzrGge2lWp40IFNTJGyUQ",authDomain:"corpus-app-c1e31.firebaseapp.com",projectId:"corpus-app-c1e31",storageBucket:"corpus-app-c1e31.firebasestorage.app",messagingSenderId:"297085911377",appId:"1:297085911377:web:cbe73dfa070bb334c31370"});
+firebase.initializeApp({apiKey:"AIzaSyALRwoikYarHPJzrGge2lWp40IFNTJGyUQ",authDomain:"corpus-app-c1e31.firebaseapp.com",projectId:"corpus-app-c1e31",storageBucket:"corpus-app-c1e31.firebasestorage.app",messagingSenderId:"297085911377",appId:"1:297085911377:web:cbe73dfa070bb334c31370",measurementId:"G-REPLACE_WITH_ID"});
 const auth=firebase.auth();
 const db=firebase.firestore();
+db.enablePersistence({synchronizeTabs:true}).catch(e=>{if(e.code!=='failed-precondition'&&e.code!=='unimplemented')console.warn('Persistence:',e);});
+let _analytics=null;try{_analytics=firebase.analytics();}catch(e){}
+function logEv(name,params={}){try{_analytics?.logEvent(name,params);}catch(e){}}
 
 /* ═══ 2. STORE ═══ */
 const S={
@@ -786,6 +806,7 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.add('on');
   document.querySelector(`.nb[data-tab="${tab}"]`).classList.add('on');
   document.getElementById('mc-wrap').scrollTop=0;curTab=tab;renderTab(tab);
+  logEv('tab_view',{tab});
 }
 document.querySelectorAll('.nb').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
 function renderTab(tab){
@@ -819,25 +840,49 @@ function showAuthScreen(){
   const el=document.getElementById('auth-s');if(!el)return;
   el.hidden=false;
   ['auth-email','auth-pass','auth-email2','auth-pass2','auth-name'].forEach(id=>{const i=document.getElementById(id);if(i)i.value='';});
-  ['auth-err1','auth-err2'].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=true;});
+  ['auth-err1','auth-err2','auth-err-forgot'].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=true;});
   document.getElementById('auth-login-panel').hidden=false;
   document.getElementById('auth-reg-panel').hidden=true;
+  document.getElementById('auth-forgot-panel').hidden=true;
   if(!_authHInit){_authHInit=true;initAuthHandlers();}
   setTimeout(()=>document.getElementById('auth-email')?.focus(),200);
 }
 function initAuthHandlers(){
   const authErrMsgs={'auth/user-not-found':'No existe una cuenta con ese email.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Email o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera un momento.','auth/email-already-in-use':'Ya existe una cuenta con ese email.','auth/invalid-email':'Email inválido.','auth/weak-password':'Contraseña demasiado débil (mín. 6 caracteres).','auth/popup-closed-by-user':'Inicio con Google cancelado.','auth/account-exists-with-different-credential':'Ya existe una cuenta con ese email.'};
   // Panel toggle
+  const showLoginPanel=()=>{document.getElementById('auth-login-panel').hidden=false;document.getElementById('auth-reg-panel').hidden=true;document.getElementById('auth-forgot-panel').hidden=true;setTimeout(()=>document.getElementById('auth-email')?.focus(),80);};
   document.getElementById('btn-to-reg').addEventListener('click',()=>{
     document.getElementById('auth-login-panel').hidden=true;
     document.getElementById('auth-reg-panel').hidden=false;
+    document.getElementById('auth-forgot-panel').hidden=true;
     setTimeout(()=>document.getElementById('auth-name')?.focus(),80);
   });
-  document.getElementById('btn-to-login').addEventListener('click',()=>{
-    document.getElementById('auth-reg-panel').hidden=true;
-    document.getElementById('auth-login-panel').hidden=false;
-    setTimeout(()=>document.getElementById('auth-email')?.focus(),80);
+  document.getElementById('btn-to-login').addEventListener('click',showLoginPanel);
+  document.getElementById('btn-forgot').addEventListener('click',()=>{
+    document.getElementById('auth-login-panel').hidden=true;
+    document.getElementById('auth-forgot-panel').hidden=false;
+    document.getElementById('auth-err-forgot').hidden=true;
+    document.getElementById('forgot-email').value='';
+    setTimeout(()=>document.getElementById('forgot-email')?.focus(),80);
   });
+  document.getElementById('btn-forgot-back').addEventListener('click',showLoginPanel);
+  document.getElementById('btn-send-reset').addEventListener('click',async()=>{
+    const email=document.getElementById('forgot-email').value.trim();
+    const errEl=document.getElementById('auth-err-forgot');
+    if(!email){errEl.textContent='Introduce tu email.';errEl.hidden=false;return;}
+    errEl.hidden=true;const btn=document.getElementById('btn-send-reset');btn.textContent='Enviando…';btn.disabled=true;
+    try{
+      await auth.sendPasswordResetEmail(email);
+      btn.textContent='Enviar email';btn.disabled=false;
+      showLoginPanel();
+      toast('Email enviado. Revisa tu bandeja de entrada.','ok');
+    }catch(e){
+      btn.textContent='Enviar email';btn.disabled=false;
+      const msgs={'auth/user-not-found':'No existe cuenta con ese email.','auth/invalid-email':'Email inválido.'};
+      errEl.textContent=msgs[e.code]||'Error al enviar. Inténtalo de nuevo.';errEl.hidden=false;
+    }
+  });
+  document.getElementById('forgot-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-send-reset').click();});
   // Email/Password login
   const doLogin=async()=>{
     const email=document.getElementById('auth-email').value.trim();const pass=document.getElementById('auth-pass').value;
@@ -881,6 +926,8 @@ function initAuthHandlers(){
   document.getElementById('btn-google1').addEventListener('click',()=>doGoogle('auth-err1'));
   document.getElementById('btn-google2').addEventListener('click',()=>doGoogle('auth-err2'));
 }
+window.addEventListener('online',()=>toast('Conexión restaurada','ok'));
+window.addEventListener('offline',()=>toast('Sin conexión — tus datos se guardarán al volver','err'));
 let _booted=false;
 function boot(){
   applyTheme(getTheme());
@@ -1094,7 +1141,7 @@ document.getElementById('btn-add-ex').addEventListener('click',()=>{
     <div id="ae-list">${exercises.map(ex=>`<div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer;" data-aeid="${ex.id}"><div style="flex:1;"><div style="font-weight:600;font-size:.9rem;">${esc(ex.name)}</div><div class="tsm tmut">${esc(ex.group)} · ${esc(ex.material)}</div></div><span style="color:var(--t3);font-size:.8rem;">→</span></div>`).join('')}</div>`);
   document.getElementById('mc-x').onclick=closeModal;
   document.getElementById('ae-grp').onchange=e=>{const v=e.target.value;document.querySelectorAll('[data-aeid]').forEach(item=>{const ex=getExById(item.dataset.aeid);item.style.display=(!v||ex?.group===v)?'':'none';});};
-  document.querySelectorAll('[data-aeid]').forEach(item=>item.addEventListener('click',()=>{const ex=getExById(item.dataset.aeid);if(!ex)return;const isCardio=ex.group==='Cardio';activeSession.exercises.push({exerciseId:ex.id,exerciseName:ex.name,sets:isCardio?[{time:0,notes:''}]:[{weight:0,reps:0,notes:''}],isSub:false,origId:null,notes:''});closeModal();renderSession();toast(`${ex.name} añadido`,'ok');}));
+  document.querySelectorAll('[data-aeid]').forEach(item=>item.addEventListener('click',()=>{const ex=getExById(item.dataset.aeid);if(!ex)return;const isCardio=ex.group==='Cardio';activeSession.exercises.push({exerciseId:ex.id,exerciseName:ex.name,sets:isCardio?[{time:0,notes:''}]:[{weight:0,reps:0,notes:''}],isSub:false,origId:null,notes:''});closeModal();renderSession();toast(`${ex.name} añadido`,'ok');logEv('exercise_added',{name:ex.name,group:ex.group});}));
 });
 function showSubModal(xi){
   const se=activeSession.exercises[xi];const ex=getExById(se.exerciseId);const exercises=getEx()||DEFAULT_EX;
@@ -1118,7 +1165,7 @@ function flushAndSave(){
     const sessions=getSess();
     sessions.unshift({id:uid(),date,exercises:activeSession.exercises.map(se=>({exerciseId:se.exerciseId,exerciseName:se.exerciseName,notes:se.notes||'',isSub:se.isSub||false,origId:se.origId||null,sets:se.sets.filter(s=>(s.weight||0)>0||(s.reps||0)>0||(s.time||0)>0).map(s=>s.time!==undefined?{time:s.time,notes:s.notes||''}:{weight:s.weight,reps:s.reps,...(s.rir!=null?{rir:s.rir}:{}),notes:s.notes||''}),})).filter(se=>se.sets.length>0),});
     setSess(sessions);activeSession={exercises:[]};document.getElementById('session-date').value=today();
-    renderSession();toast('Sesión guardada','a');setTimeout(()=>switchTab('history'),900);
+    renderSession();toast('Sesión guardada','a');logEv('session_saved',{exercises:activeSession.exercises.length});setTimeout(()=>switchTab('history'),900);
   }catch(e){console.error('Save:',e);toast('Error al guardar: '+e.message,'err');}
 }
 const _saveBtn=document.getElementById('btn-save-sess');
