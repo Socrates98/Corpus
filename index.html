@@ -565,25 +565,103 @@ const ONESIGNAL_APP_ID='1b6ce77e-35f0-4c91-a624-c8869f634446';
 const GROUPS=['Pecho','Espalda','Hombros','Bíceps','Tríceps','Piernas','Glúteos','Abdominales','Cardio'];
 const MATERIALS=['Barra','Mancuernas','Máquina','Peso corporal','Polea','Kettlebell','Banda elástica','Otro'];
 const DEFAULT_EX=[
-  {id:'e1',name:'Press de banca',group:'Pecho',material:'Barra',videoUrl:'',alternatives:['Press con mancuernas','Flexiones','Press en máquina']},
-  {id:'e2',name:'Press con mancuernas',group:'Pecho',material:'Mancuernas',videoUrl:'',alternatives:['Press de banca','Flexiones']},
+  /* ── PECHO ── */
+  {id:'e1',name:'Press de banca',group:'Pecho',material:'Barra',videoUrl:'',alternatives:['Press con mancuernas','Flexiones','Press pectoral en máquina']},
+  {id:'e2',name:'Press con mancuernas',group:'Pecho',material:'Mancuernas',videoUrl:'',alternatives:['Press de banca','Press inclinado con mancuernas']},
   {id:'e3',name:'Flexiones',group:'Pecho',material:'Peso corporal',videoUrl:'',alternatives:['Press de banca','Press con mancuernas']},
-  {id:'e4',name:'Sentadilla',group:'Piernas',material:'Barra',videoUrl:'',alternatives:['Prensa de piernas','Sentadilla goblet','Zancadas']},
-  {id:'e5',name:'Prensa de piernas',group:'Piernas',material:'Máquina',videoUrl:'',alternatives:['Sentadilla','Zancadas']},
-  {id:'e6',name:'Zancadas',group:'Piernas',material:'Peso corporal',videoUrl:'',alternatives:['Sentadilla','Prensa de piernas']},
-  {id:'e7',name:'Peso muerto',group:'Espalda',material:'Barra',videoUrl:'',alternatives:['Peso muerto rumano','Hip thrust']},
-  {id:'e8',name:'Dominadas',group:'Espalda',material:'Peso corporal',videoUrl:'',alternatives:['Jalón al pecho','Remo con barra']},
-  {id:'e9',name:'Remo con barra',group:'Espalda',material:'Barra',videoUrl:'',alternatives:['Remo con mancuerna','Jalón al pecho']},
-  {id:'e10',name:'Jalón al pecho',group:'Espalda',material:'Polea',videoUrl:'',alternatives:['Dominadas','Remo con barra']},
-  {id:'e11',name:'Press militar',group:'Hombros',material:'Barra',videoUrl:'',alternatives:['Press Arnold','Elevaciones laterales']},
-  {id:'e12',name:'Elevaciones laterales',group:'Hombros',material:'Mancuernas',videoUrl:'',alternatives:['Press militar','Press Arnold']},
-  {id:'e13',name:'Curl de bíceps',group:'Bíceps',material:'Barra',videoUrl:'',alternatives:['Curl martillo','Curl con mancuernas']},
-  {id:'e14',name:'Curl martillo',group:'Bíceps',material:'Mancuernas',videoUrl:'',alternatives:['Curl de bíceps','Curl en polea']},
-  {id:'e15',name:'Extensión de tríceps',group:'Tríceps',material:'Polea',videoUrl:'',alternatives:['Fondos en paralelas','Press cerrado']},
-  {id:'e16',name:'Fondos en paralelas',group:'Tríceps',material:'Peso corporal',videoUrl:'',alternatives:['Extensión de tríceps','Press cerrado']},
-  {id:'e17',name:'Hip thrust',group:'Glúteos',material:'Barra',videoUrl:'',alternatives:['Peso muerto rumano','Zancadas']},
-  {id:'e18',name:'Crunch abdominal',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Plancha','Elevación de piernas']},
-  {id:'e19',name:'Plancha',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Crunch abdominal','Rueda abdominal']},
+  {id:'e20',name:'Press inclinado con barra',group:'Pecho',material:'Barra',videoUrl:'',alternatives:['Press inclinado con mancuernas','Press de banca']},
+  {id:'e21',name:'Press inclinado con mancuernas',group:'Pecho',material:'Mancuernas',videoUrl:'',alternatives:['Press inclinado con barra','Aperturas en polea']},
+  {id:'e22',name:'Press declinado',group:'Pecho',material:'Barra',videoUrl:'',alternatives:['Press de banca','Fondos en paralelas']},
+  {id:'e23',name:'Aperturas con mancuernas',group:'Pecho',material:'Mancuernas',videoUrl:'',alternatives:['Aperturas en polea','Cruce de poleas']},
+  {id:'e24',name:'Aperturas en polea',group:'Pecho',material:'Polea',videoUrl:'',alternatives:['Aperturas con mancuernas','Cruce de poleas']},
+  {id:'e25',name:'Press pectoral en máquina',group:'Pecho',material:'Máquina',videoUrl:'',alternatives:['Press de banca','Press con mancuernas']},
+  {id:'e26',name:'Cruce de poleas',group:'Pecho',material:'Polea',videoUrl:'',alternatives:['Aperturas en polea','Aperturas con mancuernas']},
+  {id:'e27',name:'Pullover con mancuerna',group:'Pecho',material:'Mancuernas',videoUrl:'',alternatives:['Pull-over en polea']},
+  /* ── ESPALDA ── */
+  {id:'e7',name:'Peso muerto',group:'Espalda',material:'Barra',videoUrl:'',alternatives:['Rack pull','Peso muerto rumano']},
+  {id:'e8',name:'Dominadas',group:'Espalda',material:'Peso corporal',videoUrl:'',alternatives:['Jalón al pecho','Jalón al cuello en polea']},
+  {id:'e9',name:'Remo con barra',group:'Espalda',material:'Barra',videoUrl:'',alternatives:['Remo con mancuerna','Remo en máquina']},
+  {id:'e10',name:'Jalón al pecho',group:'Espalda',material:'Polea',videoUrl:'',alternatives:['Dominadas','Jalón al cuello en polea']},
+  {id:'e28',name:'Remo con mancuerna',group:'Espalda',material:'Mancuernas',videoUrl:'',alternatives:['Remo con barra','Remo en polea baja']},
+  {id:'e29',name:'Remo en polea baja',group:'Espalda',material:'Polea',videoUrl:'',alternatives:['Remo con barra','Remo con mancuerna']},
+  {id:'e30',name:'Jalón al cuello en polea',group:'Espalda',material:'Polea',videoUrl:'',alternatives:['Jalón al pecho','Dominadas']},
+  {id:'e31',name:'Remo en máquina',group:'Espalda',material:'Máquina',videoUrl:'',alternatives:['Remo con barra','Remo en polea baja']},
+  {id:'e32',name:'Rack pull',group:'Espalda',material:'Barra',videoUrl:'',alternatives:['Peso muerto']},
+  {id:'e33',name:'Hiperextensiones',group:'Espalda',material:'Peso corporal',videoUrl:'',alternatives:['Buenos días','Peso muerto rumano']},
+  {id:'e34',name:'Remo en T',group:'Espalda',material:'Barra',videoUrl:'',alternatives:['Remo con barra','Remo con mancuerna']},
+  {id:'e35',name:'Pull-over en polea',group:'Espalda',material:'Polea',videoUrl:'',alternatives:['Pullover con mancuerna','Jalón al pecho']},
+  /* ── HOMBROS ── */
+  {id:'e11',name:'Press militar con barra',group:'Hombros',material:'Barra',videoUrl:'',alternatives:['Press de hombros con mancuernas','Press Arnold']},
+  {id:'e12',name:'Elevaciones laterales',group:'Hombros',material:'Mancuernas',videoUrl:'',alternatives:['Elevaciones laterales en polea','Face pull']},
+  {id:'e36',name:'Press Arnold',group:'Hombros',material:'Mancuernas',videoUrl:'',alternatives:['Press militar con barra','Press de hombros con mancuernas']},
+  {id:'e37',name:'Press de hombros con mancuernas',group:'Hombros',material:'Mancuernas',videoUrl:'',alternatives:['Press militar con barra','Press Arnold']},
+  {id:'e38',name:'Elevaciones frontales',group:'Hombros',material:'Mancuernas',videoUrl:'',alternatives:['Elevaciones laterales']},
+  {id:'e39',name:'Pájaro / Elevaciones posteriores',group:'Hombros',material:'Mancuernas',videoUrl:'',alternatives:['Face pull','Elevaciones posteriores en máquina']},
+  {id:'e40',name:'Face pull',group:'Hombros',material:'Polea',videoUrl:'',alternatives:['Pájaro / Elevaciones posteriores','Remo al cuello']},
+  {id:'e41',name:'Press de hombros en máquina',group:'Hombros',material:'Máquina',videoUrl:'',alternatives:['Press militar con barra','Press de hombros con mancuernas']},
+  {id:'e42',name:'Elevaciones laterales en polea',group:'Hombros',material:'Polea',videoUrl:'',alternatives:['Elevaciones laterales']},
+  {id:'e43',name:'Encogimientos de trapecios',group:'Hombros',material:'Barra',videoUrl:'',alternatives:['Encogimientos con mancuernas']},
+  /* ── BÍCEPS ── */
+  {id:'e13',name:'Curl de bíceps con barra',group:'Bíceps',material:'Barra',videoUrl:'',alternatives:['Curl con mancuernas alterno','Curl en banco scott']},
+  {id:'e14',name:'Curl martillo',group:'Bíceps',material:'Mancuernas',videoUrl:'',alternatives:['Curl de bíceps con barra','Curl en polea baja']},
+  {id:'e44',name:'Curl en polea baja',group:'Bíceps',material:'Polea',videoUrl:'',alternatives:['Curl de bíceps con barra','Curl martillo']},
+  {id:'e45',name:'Curl concentrado',group:'Bíceps',material:'Mancuernas',videoUrl:'',alternatives:['Curl araña','Curl con mancuernas alterno']},
+  {id:'e46',name:'Curl en banco scott',group:'Bíceps',material:'Barra',videoUrl:'',alternatives:['Curl de bíceps con barra','Curl araña']},
+  {id:'e47',name:'Curl inverso',group:'Bíceps',material:'Barra',videoUrl:'',alternatives:['Curl de bíceps con barra']},
+  {id:'e48',name:'Curl araña',group:'Bíceps',material:'Mancuernas',videoUrl:'',alternatives:['Curl concentrado','Curl en banco scott']},
+  {id:'e49',name:'Curl con mancuernas alterno',group:'Bíceps',material:'Mancuernas',videoUrl:'',alternatives:['Curl de bíceps con barra','Curl martillo']},
+  /* ── TRÍCEPS ── */
+  {id:'e15',name:'Extensión de tríceps en polea',group:'Tríceps',material:'Polea',videoUrl:'',alternatives:['Extensión sobre cabeza en polea','Rompecráneos']},
+  {id:'e16',name:'Fondos en paralelas',group:'Tríceps',material:'Peso corporal',videoUrl:'',alternatives:['Press cerrado','Fondos en banco']},
+  {id:'e50',name:'Press cerrado',group:'Tríceps',material:'Barra',videoUrl:'',alternatives:['Fondos en paralelas','Rompecráneos']},
+  {id:'e51',name:'Copa con mancuerna',group:'Tríceps',material:'Mancuernas',videoUrl:'',alternatives:['Extensión sobre cabeza en polea','Rompecráneos']},
+  {id:'e52',name:'Patada de tríceps',group:'Tríceps',material:'Mancuernas',videoUrl:'',alternatives:['Extensión de tríceps en polea']},
+  {id:'e53',name:'Extensión sobre cabeza en polea',group:'Tríceps',material:'Polea',videoUrl:'',alternatives:['Copa con mancuerna','Extensión de tríceps en polea']},
+  {id:'e54',name:'Fondos en banco',group:'Tríceps',material:'Peso corporal',videoUrl:'',alternatives:['Fondos en paralelas','Press cerrado']},
+  {id:'e55',name:'Rompecráneos',group:'Tríceps',material:'Barra',videoUrl:'',alternatives:['Copa con mancuerna','Press cerrado']},
+  /* ── PIERNAS ── */
+  {id:'e4',name:'Sentadilla',group:'Piernas',material:'Barra',videoUrl:'',alternatives:['Prensa de piernas','Sentadilla goblet']},
+  {id:'e5',name:'Prensa de piernas',group:'Piernas',material:'Máquina',videoUrl:'',alternatives:['Sentadilla','Sentadilla hack']},
+  {id:'e6',name:'Zancadas',group:'Piernas',material:'Peso corporal',videoUrl:'',alternatives:['Sentadilla búlgara','Zancadas con mancuernas']},
+  {id:'e56',name:'Sentadilla búlgara',group:'Piernas',material:'Mancuernas',videoUrl:'',alternatives:['Zancadas','Sentadilla']},
+  {id:'e57',name:'Extensión de cuádriceps',group:'Piernas',material:'Máquina',videoUrl:'',alternatives:['Sentadilla','Prensa de piernas']},
+  {id:'e58',name:'Curl femoral tumbado',group:'Piernas',material:'Máquina',videoUrl:'',alternatives:['Curl femoral de pie','Peso muerto rumano']},
+  {id:'e59',name:'Peso muerto rumano',group:'Piernas',material:'Barra',videoUrl:'',alternatives:['Curl femoral tumbado','Hip thrust']},
+  {id:'e60',name:'Sentadilla hack',group:'Piernas',material:'Máquina',videoUrl:'',alternatives:['Prensa de piernas','Sentadilla']},
+  {id:'e61',name:'Zancadas con mancuernas',group:'Piernas',material:'Mancuernas',videoUrl:'',alternatives:['Zancadas','Sentadilla búlgara']},
+  {id:'e62',name:'Sentadilla goblet',group:'Piernas',material:'Kettlebell',videoUrl:'',alternatives:['Sentadilla','Prensa de piernas']},
+  {id:'e63',name:'Curl femoral de pie',group:'Piernas',material:'Máquina',videoUrl:'',alternatives:['Curl femoral tumbado','Peso muerto rumano']},
+  {id:'e64',name:'Buenos días',group:'Piernas',material:'Barra',videoUrl:'',alternatives:['Peso muerto rumano','Hiperextensiones']},
+  {id:'e65',name:'Prensa de piernas unilateral',group:'Piernas',material:'Máquina',videoUrl:'',alternatives:['Prensa de piernas','Sentadilla búlgara']},
+  {id:'e66',name:'Elevación de talones de pie',group:'Piernas',material:'Máquina',videoUrl:'',alternatives:['Elevación de talones sentado']},
+  {id:'e66b',name:'Elevación de talones sentado',group:'Piernas',material:'Máquina',videoUrl:'',alternatives:['Elevación de talones de pie']},
+  /* ── GLÚTEOS ── */
+  {id:'e17',name:'Hip thrust',group:'Glúteos',material:'Barra',videoUrl:'',alternatives:['Puente de glúteo','Peso muerto rumano con mancuernas']},
+  {id:'e67',name:'Patada de glúteo en polea',group:'Glúteos',material:'Polea',videoUrl:'',alternatives:['Hip thrust','Abducción de cadera']},
+  {id:'e68',name:'Abducción de cadera',group:'Glúteos',material:'Máquina',videoUrl:'',alternatives:['Patada de glúteo en polea','Hip thrust']},
+  {id:'e69',name:'Puente de glúteo',group:'Glúteos',material:'Peso corporal',videoUrl:'',alternatives:['Hip thrust','Sentadilla sumo']},
+  {id:'e70',name:'Sentadilla sumo',group:'Glúteos',material:'Barra',videoUrl:'',alternatives:['Sentadilla','Hip thrust']},
+  {id:'e71',name:'Step up con mancuernas',group:'Glúteos',material:'Mancuernas',videoUrl:'',alternatives:['Zancadas','Hip thrust']},
+  {id:'e72',name:'Peso muerto rumano con mancuernas',group:'Glúteos',material:'Mancuernas',videoUrl:'',alternatives:['Peso muerto rumano','Hip thrust']},
+  /* ── ABDOMINALES ── */
+  {id:'e18',name:'Crunch abdominal',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Crunch en máquina','Sit-up']},
+  {id:'e19',name:'Plancha',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Plancha lateral','Mountain climbers']},
+  {id:'e73',name:'Elevación de piernas',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Crunch abdominal','Rueda abdominal']},
+  {id:'e74',name:'Rueda abdominal',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Plancha','Elevación de piernas']},
+  {id:'e75',name:'Crunch en polea',group:'Abdominales',material:'Polea',videoUrl:'',alternatives:['Crunch abdominal','Crunch en máquina']},
+  {id:'e76',name:'Plancha lateral',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Plancha','Rotación con polea']},
+  {id:'e77',name:'Mountain climbers',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Plancha','Crunch abdominal']},
+  {id:'e78',name:'Sit-up',group:'Abdominales',material:'Peso corporal',videoUrl:'',alternatives:['Crunch abdominal','Elevación de piernas']},
+  {id:'e79',name:'Crunch en máquina',group:'Abdominales',material:'Máquina',videoUrl:'',alternatives:['Crunch abdominal','Crunch en polea']},
+  {id:'e80',name:'Rotación con polea',group:'Abdominales',material:'Polea',videoUrl:'',alternatives:['Plancha lateral']},
+  /* ── CARDIO ── */
+  {id:'e81',name:'Bicicleta estática',group:'Cardio',material:'Máquina',videoUrl:'',alternatives:['Elíptica','Cinta de correr'],cardio:true},
+  {id:'e82',name:'Cinta de correr',group:'Cardio',material:'Máquina',videoUrl:'',alternatives:['Bicicleta estática','Elíptica'],cardio:true},
+  {id:'e83',name:'Escaladora',group:'Cardio',material:'Máquina',videoUrl:'',alternatives:['Elíptica','Bicicleta estática'],cardio:true},
+  {id:'e84',name:'Elíptica',group:'Cardio',material:'Máquina',videoUrl:'',alternatives:['Bicicleta estática','Cinta de correr'],cardio:true},
+  {id:'e85',name:'Remo ergómetro',group:'Cardio',material:'Máquina',videoUrl:'',alternatives:['Bicicleta estática','Elíptica'],cardio:true},
+  {id:'e86',name:'Saltar a la comba',group:'Cardio',material:'Peso corporal',videoUrl:'',alternatives:['HIIT'],cardio:true},
+  {id:'e87',name:'HIIT',group:'Cardio',material:'Peso corporal',videoUrl:'',alternatives:['Saltar a la comba'],cardio:true},
 ];
 
 /* ═══ 1b. FIREBASE INIT ═══ */
@@ -663,7 +741,7 @@ function fmtDate(ds){try{return new Date(ds+'T00:00:00').toLocaleDateString('es-
 function fmtShort(ds){try{return new Date(ds+'T00:00:00').toLocaleDateString('es-ES',{day:'2-digit',month:'short'});}catch{return ds;}}
 function getExById(id){return(getEx()||DEFAULT_EX).find(e=>e.id===id);}
 function getExByName(n){return(getEx()||DEFAULT_EX).find(e=>e.name.toLowerCase()===n.toLowerCase());}
-function getLastSets(exId){for(const s of getSess()){const ex=s.exercises.find(e=>e.exerciseId===exId);if(ex&&ex.sets.length>0)return ex.sets.map(s=>({weight:+(s.weight||0),reps:+(s.reps||0),rir:s.rir??null,notes:''}));}return[{weight:0,reps:0,rir:null,notes:''}];}
+function getLastSets(exId){const def=getExById(exId);const isCardio=def?.group==='Cardio';for(const s of getSess()){const ex=s.exercises.find(e=>e.exerciseId===exId);if(ex&&ex.sets.length>0){if(isCardio)return ex.sets.map(s=>({time:s.time||0,notes:''}));return ex.sets.map(s=>({weight:+(s.weight||0),reps:+(s.reps||0),rir:s.rir??null,notes:''}));}}return isCardio?[{time:0,notes:''}]:[{weight:0,reps:0,rir:null,notes:''}];}
 
 /* ═══ 4. THEME ═══ */
 function applyTheme(t){
@@ -973,13 +1051,22 @@ function renderSession(){
   footer.hidden=false;
   requestAnimationFrame(()=>{if(footer&&container)container.style.paddingBottom=(footer.offsetHeight+8)+'px';});
   const showRIR=getShowRIR();
+  const notesStyle='flex:2;font-size:1rem;min-height:38px;padding:8px 10px;background:var(--s3);border-radius:var(--r8);border:1px solid transparent;color:var(--t);outline:none;touch-action:manipulation;';
   container.innerHTML=activeSession.exercises.map((se,xi)=>{
     const ex=getExById(se.exerciseId)||{name:se.exerciseName,group:'?',material:'?',videoUrl:''};
+    const isCardio=ex.group==='Cardio';
     const vurl=ex.videoUrl||`https://www.youtube.com/results?search_query=${encodeURIComponent(se.exerciseName+' técnica')}`;
+    const hdr=`<div class="sex-hdr"><button class="drag-handle" title="Mover">⠿</button><div class="sex-name">${esc(se.exerciseName)}${se.isSub?` <span class="sub-badge">Sust.</span>`:''}</div><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:6px 11px;min-height:34px;font-size:.78rem;">▶</a>${isCardio?'':`<button class="btn btn-w btn-sm" data-sub="${xi}" style="padding:6px 11px;min-height:34px;font-size:.78rem;">No puedo</button>`}<button class="ico-btn" data-dex="${xi}" style="font-size:.8rem;">✕</button></div>`;
+    if(isCardio){
+      const t=se.sets[0]?.time||0;
+      return`<div class="sex-card">${hdr}<div style="display:flex;align-items:center;gap:12px;padding:14px 0 10px;"><span style="color:var(--t2);font-size:.85rem;font-weight:600;">Duración</span><div style="display:inline-flex;align-items:center;gap:4px;"><button class="step-btn" data-xi="${xi}" data-cdelta="-5" style="font-size:.72rem;">−5</button><input type="number" class="set-inp cardio-t" min="0" max="300" step="1" value="${t||''}" placeholder="0" data-xi="${xi}" style="width:60px;text-align:center;"><button class="step-btn" data-xi="${xi}" data-cdelta="5" style="font-size:.72rem;">+5</button></div><span style="color:var(--t2);font-size:.85rem;">min</span></div><div style="padding:0 0 8px;"><input type="text" placeholder="Notas..." id="snotes-${xi}" value="${esc(se.notes||'')}" style="${notesStyle}width:100%;box-sizing:border-box;"/></div></div>`;
+    }
     const inpW=showRIR?'width:58px;':'';
     const rows=se.sets.map((s,si)=>`<tr><td><input type="number" class="set-inp" min="0" max="999" step="0.5" value="${s.weight||''}" placeholder="0" data-xi="${xi}" data-si="${si}" data-f="weight" style="${inpW}"></td><td style="padding:4px 4px;"><div style="display:inline-flex;align-items:center;gap:2px;"><button class="step-btn" data-xi="${xi}" data-si="${si}" data-f="reps" data-delta="-1">−</button><input type="number" class="set-inp" min="0" max="999" step="1" value="${s.reps||''}" placeholder="0" data-xi="${xi}" data-si="${si}" data-f="reps" style="width:56px;"><button class="step-btn" data-xi="${xi}" data-si="${si}" data-f="reps" data-delta="1">+</button></div></td>${showRIR?`<td style="padding:4px 4px;"><div style="display:inline-flex;align-items:center;gap:2px;"><button class="step-btn" data-xi="${xi}" data-si="${si}" data-f="rir" data-delta="-1">−</button><input type="number" class="set-inp" min="0" max="10" step="1" value="${s.rir!=null?s.rir:''}" placeholder="—" data-xi="${xi}" data-si="${si}" data-f="rir" style="width:48px;"><button class="step-btn" data-xi="${xi}" data-si="${si}" data-f="rir" data-delta="1">+</button></div></td>`:''}<td><div class="set-acts"><button class="ico-btn" data-rpt="${xi}-${si}" style="font-size:.75rem;" title="Repetir">↻</button><button class="ico-btn" data-dset="${xi}-${si}" style="font-size:.75rem;">✕</button></div></td></tr>`).join('');
-    return`<div class="sex-card"><div class="sex-hdr"><button class="drag-handle" title="Mover">⠿</button><div class="sex-name">${esc(se.exerciseName)}${se.isSub?` <span class="sub-badge">Sust.</span>`:''}</div><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:6px 11px;min-height:34px;font-size:.78rem;">▶</a><button class="btn btn-w btn-sm" data-sub="${xi}" style="padding:6px 11px;min-height:34px;font-size:.78rem;">No puedo</button><button class="ico-btn" data-dex="${xi}" style="font-size:.8rem;">✕</button></div><div style="overflow-x:auto;"><table class="sets-tbl"><thead><tr><th>Kg</th><th>Reps</th>${showRIR?'<th>RIR</th>':''}<th></th></tr></thead><tbody>${rows}</tbody></table></div><div class="sex-add"><button class="btn btn-s btn-sm" data-aset="${xi}" style="flex:1;">+ Serie</button><input type="text" placeholder="Notas..." id="snotes-${xi}" value="${esc(se.notes||'')}" style="flex:2;font-size:1rem;min-height:38px;padding:8px 10px;background:var(--s3);border-radius:var(--r8);border:1px solid transparent;color:var(--t);outline:none;touch-action:manipulation;" /></div></div>`;
+    return`<div class="sex-card">${hdr}<div style="overflow-x:auto;"><table class="sets-tbl"><thead><tr><th>Kg</th><th>Reps</th>${showRIR?'<th>RIR</th>':''}<th></th></tr></thead><tbody>${rows}</tbody></table></div><div class="sex-add"><button class="btn btn-s btn-sm" data-aset="${xi}" style="flex:1;">+ Serie</button><input type="text" placeholder="Notas..." id="snotes-${xi}" value="${esc(se.notes||'')}" style="${notesStyle}" /></div></div>`;
   }).join('');
+  container.querySelectorAll('.cardio-t').forEach(inp=>{inp.addEventListener('input',e=>{const xi=+e.target.dataset.xi;if(!activeSession.exercises[xi].sets[0])activeSession.exercises[xi].sets[0]={notes:''};activeSession.exercises[xi].sets[0].time=parseInt(e.target.value)||0;});});
+  container.querySelectorAll('[data-cdelta]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const xi=+btn.dataset.xi,delta=+btn.dataset.cdelta;const t=Math.max(0,(activeSession.exercises[xi].sets[0]?.time||0)+delta);if(!activeSession.exercises[xi].sets[0])activeSession.exercises[xi].sets[0]={notes:''};activeSession.exercises[xi].sets[0].time=t;const inp=btn.closest('div').querySelector('.cardio-t');if(inp)inp.value=t||'';}));
   container.querySelectorAll('[data-f]').forEach(inp=>{const h=e=>{const xi=+e.target.dataset.xi,si=+e.target.dataset.si,f=e.target.dataset.f;const v=e.target.value;activeSession.exercises[xi].sets[si][f]=f==='rir'?(v===''?null:parseInt(v)):parseFloat(v)||0;};inp.addEventListener('input',h);inp.addEventListener('change',h);inp.addEventListener('focus',e=>{const td=e.target.closest('td');const colIdx=td?[...td.parentElement.children].indexOf(td):-1;const tbl=e.target.closest('table');if(tbl&&colIdx>=0)tbl.querySelectorAll('thead th').forEach((th,i)=>th.classList.toggle('col-active',i===colIdx));});inp.addEventListener('blur',e=>{const tbl=e.target.closest('table');if(tbl)tbl.querySelectorAll('thead th').forEach(th=>th.classList.remove('col-active'));});});
   container.querySelectorAll('.step-btn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const xi=+btn.dataset.xi,si=+btn.dataset.si,f=btn.dataset.f,delta=+btn.dataset.delta;const cur=f==='rir'?(activeSession.exercises[xi].sets[si].rir??0):(activeSession.exercises[xi].sets[si][f]||0);let v=Math.max(0,cur+delta);if(f==='rir')v=Math.min(10,v);else v=Math.min(999,v);if(f==='rir')activeSession.exercises[xi].sets[si].rir=v;else activeSession.exercises[xi].sets[si][f]=v;const inp=btn.closest('div').querySelector('input');if(inp)inp.value=v;}));
   container.querySelectorAll('[data-aset]').forEach(btn=>btn.addEventListener('click',e=>{const xi=+e.target.dataset.aset;const last=activeSession.exercises[xi].sets.at(-1)||{weight:0,reps:0,rir:null,notes:''};activeSession.exercises[xi].sets.push({weight:last.weight,reps:last.reps,rir:null,notes:''});renderSession();}));
@@ -1001,7 +1088,7 @@ document.getElementById('btn-add-ex').addEventListener('click',()=>{
     <div id="ae-list">${exercises.map(ex=>`<div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer;" data-aeid="${ex.id}"><div style="flex:1;"><div style="font-weight:600;font-size:.9rem;">${esc(ex.name)}</div><div class="tsm tmut">${esc(ex.group)} · ${esc(ex.material)}</div></div><span style="color:var(--t3);font-size:.8rem;">→</span></div>`).join('')}</div>`);
   document.getElementById('mc-x').onclick=closeModal;
   document.getElementById('ae-grp').onchange=e=>{const v=e.target.value;document.querySelectorAll('[data-aeid]').forEach(item=>{const ex=getExById(item.dataset.aeid);item.style.display=(!v||ex?.group===v)?'':'none';});};
-  document.querySelectorAll('[data-aeid]').forEach(item=>item.addEventListener('click',()=>{const ex=getExById(item.dataset.aeid);if(!ex)return;activeSession.exercises.push({exerciseId:ex.id,exerciseName:ex.name,sets:[{weight:0,reps:0,notes:''}],isSub:false,origId:null,notes:''});closeModal();renderSession();toast(`${ex.name} añadido`,'ok');}));
+  document.querySelectorAll('[data-aeid]').forEach(item=>item.addEventListener('click',()=>{const ex=getExById(item.dataset.aeid);if(!ex)return;const isCardio=ex.group==='Cardio';activeSession.exercises.push({exerciseId:ex.id,exerciseName:ex.name,sets:isCardio?[{time:0,notes:''}]:[{weight:0,reps:0,notes:''}],isSub:false,origId:null,notes:''});closeModal();renderSession();toast(`${ex.name} añadido`,'ok');}));
 });
 function showSubModal(xi){
   const se=activeSession.exercises[xi];const ex=getExById(se.exerciseId);const exercises=getEx()||DEFAULT_EX;
@@ -1018,11 +1105,12 @@ function flushAndSave(){
   try{
     document.querySelectorAll('[data-f]').forEach(inp=>{const xi=+inp.dataset.xi,si=+inp.dataset.si,f=inp.dataset.f;if(activeSession.exercises[xi]?.sets[si]!==undefined){const v=inp.value;activeSession.exercises[xi].sets[si][f]=f==='rir'?(v===''?null:parseInt(v)):parseFloat(v)||0;}});
     activeSession.exercises.forEach((se,xi)=>{const inp=document.getElementById(`snotes-${xi}`);if(inp)se.notes=inp.value;});
-    const hasData=activeSession.exercises.some(se=>se.sets.some(s=>(s.weight||0)>0||(s.reps||0)>0));
+    document.querySelectorAll('.cardio-t').forEach(inp=>{const xi=+inp.dataset.xi;if(activeSession.exercises[xi]?.sets[0]!==undefined)activeSession.exercises[xi].sets[0].time=parseInt(inp.value)||0;});
+    const hasData=activeSession.exercises.some(se=>se.sets.some(s=>(s.weight||0)>0||(s.reps||0)>0||(s.time||0)>0));
     if(!hasData){toast('Añade al menos una serie con datos','err');return;}
     const date=document.getElementById('session-date').value||today();
     const sessions=getSess();
-    sessions.unshift({id:uid(),date,exercises:activeSession.exercises.map(se=>({exerciseId:se.exerciseId,exerciseName:se.exerciseName,notes:se.notes||'',isSub:se.isSub||false,origId:se.origId||null,sets:se.sets.filter(s=>(s.weight||0)>0||(s.reps||0)>0).map(s=>({weight:s.weight,reps:s.reps,...(s.rir!=null?{rir:s.rir}:{}),notes:s.notes||''})),})).filter(se=>se.sets.length>0),});
+    sessions.unshift({id:uid(),date,exercises:activeSession.exercises.map(se=>({exerciseId:se.exerciseId,exerciseName:se.exerciseName,notes:se.notes||'',isSub:se.isSub||false,origId:se.origId||null,sets:se.sets.filter(s=>(s.weight||0)>0||(s.reps||0)>0||(s.time||0)>0).map(s=>s.time!==undefined?{time:s.time,notes:s.notes||''}:{weight:s.weight,reps:s.reps,...(s.rir!=null?{rir:s.rir}:{}),notes:s.notes||''}),})).filter(se=>se.sets.length>0),});
     setSess(sessions);activeSession={exercises:[]};document.getElementById('session-date').value=today();
     renderSession();toast('Sesión guardada','a');setTimeout(()=>switchTab('history'),900);
   }catch(e){console.error('Save:',e);toast('Error al guardar: '+e.message,'err');}
@@ -1073,7 +1161,7 @@ function renderHistory(){
 function viewSession(id){
   const s=getSess().find(s=>s.id===id);if(!s)return;
   openModal(`<div class="mh"><span class="mt">${fmtDate(s.date)}</span><button class="ico-btn" id="mc-x">✕</button></div>
-    ${s.exercises.map(ex=>`<div class="mb16"><div style="font-family:var(--ff);font-weight:700;margin-bottom:8px;">${ex.isSub?`<span class="sub-badge" style="margin-right:5px">↔</span>`:''}${esc(ex.exerciseName)}</div><div style="background:var(--s2);border-radius:var(--r8);overflow:hidden;"><table class="sets-tbl"><thead><tr><th>#</th><th>Kg</th><th>Reps</th><th>1RM est.</th></tr></thead><tbody>${ex.sets.map((s,i)=>`<tr><td class="set-n">${i+1}</td><td class="fnum">${s.weight}</td><td class="fnum">${s.reps}${s.rir!=null?` <span style="font-size:.72em;color:var(--ok);">RIR${s.rir}</span>`:''}</td><td class="fnum" style="color:var(--at);">${calc1RM(s.weight,s.reps).toFixed(1)}</td></tr>`).join('')}</tbody></table></div>${ex.notes?`<p class="tsm tmut mt8">${esc(ex.notes)}</p>`:''}</div>`).join('')}`);
+    ${s.exercises.map(ex=>{const isC=ex.sets.length>0&&ex.sets[0].time!==undefined;return`<div class="mb16"><div style="font-family:var(--ff);font-weight:700;margin-bottom:8px;">${ex.isSub?`<span class="sub-badge" style="margin-right:5px">↔</span>`:''}${esc(ex.exerciseName)}</div><div style="background:var(--s2);border-radius:var(--r8);overflow:hidden;"><table class="sets-tbl"><thead><tr><th>#</th>${isC?'<th>Duración</th>':'<th>Kg</th><th>Reps</th><th>1RM est.</th>'}</tr></thead><tbody>${ex.sets.map((s,i)=>`<tr><td class="set-n">${i+1}</td>${isC?`<td class="fnum">${s.time||0} min</td>`:`<td class="fnum">${s.weight}</td><td class="fnum">${s.reps}${s.rir!=null?` <span style="font-size:.72em;color:var(--ok);">RIR${s.rir}</span>`:''}</td><td class="fnum" style="color:var(--at);">${calc1RM(s.weight,s.reps).toFixed(1)}</td>`}</tr>`).join('')}</tbody></table></div>${ex.notes?`<p class="tsm tmut mt8">${esc(ex.notes)}</p>`:''}</div>`;}).join('')}`);
   document.getElementById('mc-x').onclick=closeModal;
 }
 

@@ -1,4 +1,4 @@
-const CACHE = 'corpus-v18';
+const CACHE = 'corpus-v19';
 const ASSETS = ['/', '/index.html', '/manifest.json', '/assets/icon-180.png', '/assets/icon-192.png', '/assets/icon-512.png'];
 
 self.addEventListener('install', e => {
