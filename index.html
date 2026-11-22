@@ -787,15 +787,17 @@ function toast(msg,type=''){
 }
 
 /* ═══ 6. MODAL ═══ */
-let _mcb=null;
-function openModal(html,onClose){document.getElementById('m-inner').innerHTML=html;document.getElementById('mo').classList.add('on');_mcb=onClose||null;}
-function closeModal(){const box=document.getElementById('m-inner');document.getElementById('mo').classList.remove('on');box.style.transform='';box.style.transition='';if(_mcb){_mcb();_mcb=null;}}
+let _mcb=null,_swipeTimer=null;
+function openModal(html,onClose){clearTimeout(_swipeTimer);const box=document.getElementById('m-inner');box.style.transform='';box.style.transition='';box.scrollTop=0;box.innerHTML=html;document.getElementById('mo').classList.add('on');_mcb=onClose||null;}
+function closeModal(){clearTimeout(_swipeTimer);const box=document.getElementById('m-inner');document.getElementById('mo').classList.remove('on');box.style.transform='';box.style.transition='';if(_mcb){_mcb();_mcb=null;}}
 document.getElementById('mo').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 // Swipe-down to dismiss
 (function(){const box=document.getElementById('m-inner');let sy=0,cy=0,act=false;
 box.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const ty=e.touches[0].clientY;if(box.scrollTop===0||ty-box.getBoundingClientRect().top<44){sy=ty;cy=ty;act=true;box.style.transition='none';}},{passive:true});
 box.addEventListener('touchmove',e=>{if(!act)return;cy=e.touches[0].clientY;const dy=Math.max(0,cy-sy);if(dy>0)box.style.transform=`translateY(${dy}px)`;},{passive:true});
-box.addEventListener('touchend',()=>{if(!act)return;act=false;if(cy-sy>90){box.style.transition='transform .25s cubic-bezier(.32,.72,0,1)';box.style.transform='translateY(110%)';setTimeout(()=>closeModal(),230);}else{box.style.transition='transform .2s cubic-bezier(.32,.72,0,1)';box.style.transform='';box.addEventListener('transitionend',()=>{box.style.transition='';},{once:true});}});
+const endSwipe=()=>{if(!act)return;act=false;if(cy-sy>90){box.style.transition='transform .25s cubic-bezier(.32,.72,0,1)';box.style.transform='translateY(110%)';_swipeTimer=setTimeout(()=>closeModal(),230);}else{box.style.transition='transform .2s cubic-bezier(.32,.72,0,1)';box.style.transform='';box.addEventListener('transitionend',()=>{box.style.transition='';},{once:true});}};
+box.addEventListener('touchend',endSwipe);
+box.addEventListener('touchcancel',()=>{act=false;box.style.transform='';box.style.transition='';});
 })();
 
 /* ═══ 7. NAV ═══ */
