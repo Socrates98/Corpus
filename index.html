@@ -708,7 +708,13 @@ async function loadFromFS(uid){
     if(doc.exists){
       const d=doc.data();_noSync=true;
       if(d.name)S.set('gym_user',d.name);
-      if(d.exercises?.length)S.set('gym_exercises',d.exercises);
+      if(d.exercises?.length){
+        const existingIds=new Set(d.exercises.map(e=>e.id));
+        const newOnes=DEFAULT_EX.filter(e=>!existingIds.has(e.id));
+        const merged=newOnes.length?[...d.exercises,...newOnes]:d.exercises;
+        S.set('gym_exercises',merged);
+        if(newOnes.length)schedSync();
+      }
       if(d.sessions?.length){
         const local=S.get('gym_sessions',[]);
         if(local.length>d.sessions.length){
