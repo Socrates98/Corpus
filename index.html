@@ -386,7 +386,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
   <header class="phdr">
     <div class="phdr-title">A entrenar, <span class="hl" id="hdr-user">—</span></div>
     <div style="display:flex;align-items:center;gap:10px;">
-      <div class="sync-ind" id="sync-ind" title="Sincronización en la nube"></div>
+      <div class="sync-ind" id="sync-ind" title="Sincronización en la nube" hidden></div>
       <div id="hdr-actions"></div>
     </div>
   </header>
@@ -746,7 +746,8 @@ const setVibrate=v=>S.set('gym_vibrate',v);
 
 /* ═══ 2b. FIREBASE SYNC ═══ */
 let _syncTimer=null;
-function setSyncState(s){const el=document.getElementById('sync-ind');if(el)el.className='sync-ind'+(s?' '+s:'');}
+function setSyncState(s){const el=document.getElementById('sync-ind');if(!el)return;el.className='sync-ind'+(s?' '+s:'');el.hidden=!s;}
+function shortName(full){const w=full.trim().split(/\s+/);if(w.length<=2)return full;for(let i=1;i<w.length;i++){if(/^[A-ZÁÉÍÓÚÜÑ]/i.test(w[i])&&w[i][0]===w[i][0].toUpperCase()&&w[i][0]!==w[i][0].toLowerCase())return w[0]+' '+w[i];}return w[0];}
 function schedSync(){
   clearTimeout(_syncTimer);
   _syncTimer=setTimeout(async()=>{
@@ -883,7 +884,7 @@ function launchApp(name){
   document.getElementById('ws').hidden=true;
   document.getElementById('auth-s').hidden=true;
   document.getElementById('app').hidden=false;
-  document.getElementById('hdr-user').textContent=name;
+  document.getElementById('hdr-user').textContent=shortName(name);
   document.getElementById('session-date').value=today();
   document.getElementById('set-name').value=name;
   renderTab('session');initOneSignal();updateHowBar();
@@ -1580,7 +1581,7 @@ function renderSettings(){
 }
 document.getElementById('btn-save-name').addEventListener('click',()=>{
   const v=document.getElementById('set-name').value.trim();if(!v)return;
-  setUser(v);document.getElementById('hdr-user').textContent=v;toast('Nombre actualizado','ok');
+  setUser(v);document.getElementById('hdr-user').textContent=shortName(v);toast('Nombre actualizado','ok');
 });
 
 
