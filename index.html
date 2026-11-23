@@ -149,7 +149,7 @@ small{font-size:.78rem;color:var(--t2);}
 .set-inp{background:var(--s3);border:1px solid transparent;border-radius:var(--r8);padding:5px 4px;color:var(--t);font-size:1rem;font-family:var(--fb);font-variant-numeric:tabular-nums;width:68px;min-height:40px;text-align:center;-webkit-appearance:none;appearance:none;outline:none;transition:border-color .15s;touch-action:manipulation;}
 .set-inp:focus{border-color:var(--a);}
 .sets-tbl tbody tr:focus-within{background:rgba(201,247,49,.05);}
-.sets-tbl tbody tr:focus-within .set-inp{border-color:var(--a);}
+.set-inp:focus{border-color:var(--a);box-shadow:0 0 0 2px rgba(201,247,49,.18);}
 .sets-tbl th.col-active{color:var(--a)!important;}
 .ico-btn[data-dset],.ico-btn[data-dex],#mc-x{color:rgba(248,113,113,.5);}
 .ico-btn[data-dset]:hover,.ico-btn[data-dex]:hover,#mc-x:hover{color:var(--er);}
@@ -1125,7 +1125,7 @@ document.getElementById('btn-load-routine').addEventListener('click',()=>{
 let activeSession={exercises:[]};
 const rpShown=new Map();
 function getExAllTimeMax(exId){const ex=getExById(exId);let mw=0,m1=0;getSess().forEach(s=>{const se=s.exercises.find(e=>e.exerciseId===exId||e.exerciseName===ex?.name);if(!se)return;se.sets.forEach(st=>{mw=Math.max(mw,st.weight||0);m1=Math.max(m1,calc1RM(st.weight||0,st.reps||0));});});return{mw,m1};}
-function checkRP(xi,si){const se=activeSession.exercises[xi];if(!se)return;const s=se.sets[si];if(!s||!(s.weight>0)||!(s.reps>0))return;const cur1RM=calc1RM(s.weight,s.reps);if(cur1RM<=0)return;const best=getExAllTimeMax(se.exerciseId);const prev=rpShown.get(se.exerciseId)||0;if(cur1RM>best.m1&&cur1RM>prev){rpShown.set(se.exerciseId,cur1RM);toast('🏆 Nuevo RP · '+se.exerciseName,'a');if(getVibrate())navigator.vibrate?.([40,20,40]);}}
+function checkRP(xi,si){const se=activeSession.exercises[xi];if(!se)return;const s=se.sets[si];if(!s||!(s.weight>0))return;const best=getExAllTimeMax(se.exerciseId);const prevW=rpShown.get(se.exerciseId+'_w')||0;const prevR=rpShown.get(se.exerciseId+'_r')||0;let fired=false;if(s.weight>best.mw&&s.weight>prevW){rpShown.set(se.exerciseId+'_w',s.weight);fired=true;}if(s.reps>0){const cur1RM=calc1RM(s.weight,s.reps);if(cur1RM>best.m1&&cur1RM>prevR){rpShown.set(se.exerciseId+'_r',cur1RM);fired=true;}}if(fired){toast('🏆 Nuevo RP · '+se.exerciseName,'a');if(getVibrate())navigator.vibrate?.([40,20,40]);}}
 function renderSession(){
   const container=document.getElementById('sess-list'),footer=document.getElementById('sess-footer');
   if(!activeSession.exercises.length){
@@ -1289,7 +1289,7 @@ function renderHistory(){
 function viewSession(id){
   const s=getSess().find(s=>s.id===id);if(!s)return;
   openModal(`<div class="mh"><span class="mt">${fmtDate(s.date)}</span><button class="ico-btn" id="mc-x">✕</button></div>
-    ${s.exercises.map(ex=>{const isC=ex.sets.length>0&&ex.sets[0].time!==undefined;return`<div class="mb16"><div style="font-family:var(--ff);font-weight:700;margin-bottom:8px;">${ex.isSub?`<span class="sub-badge" style="margin-right:5px">↔</span>`:''}${esc(ex.exerciseName)}</div><div style="background:var(--s2);border-radius:var(--r8);overflow:hidden;"><table class="sets-tbl"><thead><tr><th>#</th>${isC?'<th>Duración</th>':'<th>Kg</th><th>Reps</th><th>1RM est.</th>'}</tr></thead><tbody>${ex.sets.map((s,i)=>`<tr><td class="set-n">${i+1}</td>${isC?`<td class="fnum">${s.time||0} min</td>`:`<td class="fnum">${s.weight}</td><td class="fnum">${s.reps}${s.rir!=null?` <span style="font-size:.72em;color:var(--ok);">RIR${s.rir}</span>`:''}</td><td class="fnum" style="color:var(--at);">${calc1RM(s.weight,s.reps).toFixed(1)}</td>`}</tr>`).join('')}</tbody></table></div>${ex.notes?`<p class="tsm tmut mt8">${esc(ex.notes)}</p>`:''}</div>`;}).join('')}`);
+    ${s.exercises.map(ex=>{const isC=ex.sets.length>0&&ex.sets[0].time!==undefined;return`<div class="mb16"><div style="font-family:var(--ff);font-weight:700;margin-bottom:8px;">${ex.isSub?`<span class="sub-badge" style="margin-right:5px">↔</span>`:''}${esc(ex.exerciseName)}</div><div style="background:var(--s2);border-radius:var(--r8);overflow:hidden;"><table class="sets-tbl"><thead><tr><th>#</th>${isC?'<th>Duración</th>':'<th>Kg</th><th>Reps</th>'}</tr></thead><tbody>${ex.sets.map((s,i)=>`<tr><td class="set-n">${i+1}</td>${isC?`<td class="fnum">${s.time||0} min</td>`:`<td class="fnum">${s.weight}</td><td class="fnum">${s.reps}${s.rir!=null?` <span style="font-size:.72em;color:var(--ok);">RIR${s.rir}</span>`:''}</td>`}</tr>`).join('')}</tbody></table></div>${ex.notes?`<p class="tsm tmut mt8">${esc(ex.notes)}</p>`:''}</div>`;}).join('')}`);
   document.getElementById('mc-x').onclick=closeModal;
 }
 
