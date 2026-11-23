@@ -876,7 +876,7 @@ function showAuthScreen(){
   setTimeout(()=>document.getElementById('auth-email')?.focus(),200);
 }
 function initAuthHandlers(){
-  const authErrMsgs={'auth/user-not-found':'No existe una cuenta con ese email.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Email o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera un momento.','auth/email-already-in-use':'Ya existe una cuenta con ese email.','auth/invalid-email':'Email inválido.','auth/weak-password':'Contraseña demasiado débil (mín. 6 caracteres).','auth/popup-closed-by-user':'Inicio con Google cancelado.','auth/account-exists-with-different-credential':'Ya existe una cuenta con ese email.'};
+  const authErrMsgs={'auth/user-not-found':'No existe una cuenta con ese email.','auth/wrong-password':'Contraseña incorrecta.','auth/invalid-credential':'Email o contraseña incorrectos.','auth/too-many-requests':'Demasiados intentos. Espera un momento.','auth/email-already-in-use':'Ya existe una cuenta con ese email.','auth/invalid-email':'Email inválido.','auth/weak-password':'Contraseña demasiado débil (mín. 6 caracteres).','auth/popup-closed-by-user':'Inicio con Google cancelado.','auth/account-exists-with-different-credential':'Ya existe una cuenta con ese email.','auth/network-request-failed':'Sin conexión. Comprueba tu red.','auth/user-disabled':'Esta cuenta ha sido desactivada.','auth/operation-not-allowed':'Método de inicio de sesión no disponible.'};
   // Panel toggle
   const showLoginPanel=()=>{document.getElementById('auth-login-panel').hidden=false;document.getElementById('auth-reg-panel').hidden=true;document.getElementById('auth-forgot-panel').hidden=true;setTimeout(()=>document.getElementById('auth-email')?.focus(),80);};
   document.getElementById('btn-to-reg').addEventListener('click',()=>{
@@ -1195,10 +1195,14 @@ function renderSession(){
 document.getElementById('btn-add-ex').addEventListener('click',()=>{
   const exercises=getEx()||DEFAULT_EX;const groups=[...new Set(exercises.map(e=>e.group))];
   openModal(`<div class="mh"><span class="mt">Añadir ejercicio</span><button class="ico-btn" id="mc-x">✕</button></div>
+    <input id="ae-q" type="text" placeholder="🔍 Buscar..." autocomplete="off" style="width:100%;margin-bottom:10px;background:var(--s3);border:1px solid var(--b);border-radius:var(--r8);padding:9px 12px;color:var(--t);font-size:.95rem;font-family:var(--fb);outline:none;">
     <div class="fg mb12"><label class="fl">Filtrar grupo</label><select id="ae-grp"><option value="">Todos</option>${groups.map(g=>`<option value="${g}">${g}</option>`).join('')}</select></div>
     <div id="ae-list">${exercises.map(ex=>`<div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--b);cursor:pointer;" data-aeid="${ex.id}"><div style="flex:1;"><div style="font-weight:600;font-size:.9rem;">${esc(ex.name)}</div><div class="tsm tmut">${esc(ex.group)} · ${esc(ex.material)}</div></div><span style="color:var(--t3);font-size:.8rem;">→</span></div>`).join('')}</div>`);
   document.getElementById('mc-x').onclick=closeModal;
-  document.getElementById('ae-grp').onchange=e=>{const v=e.target.value;document.querySelectorAll('[data-aeid]').forEach(item=>{const ex=getExById(item.dataset.aeid);item.style.display=(!v||ex?.group===v)?'':'none';});};
+  const filterList=()=>{const q=document.getElementById('ae-q').value.trim().toLowerCase();const grp=document.getElementById('ae-grp').value;document.querySelectorAll('[data-aeid]').forEach(item=>{const ex=getExById(item.dataset.aeid);const matchGrp=!grp||ex?.group===grp;const matchQ=!q||ex?.name.toLowerCase().includes(q);item.style.display=(matchGrp&&matchQ)?'':'none';});};
+  document.getElementById('ae-grp').onchange=filterList;
+  document.getElementById('ae-q').addEventListener('input',filterList);
+  setTimeout(()=>document.getElementById('ae-q')?.focus(),80);
   document.querySelectorAll('[data-aeid]').forEach(item=>item.addEventListener('click',()=>{const ex=getExById(item.dataset.aeid);if(!ex)return;const isCardio=ex.group==='Cardio';activeSession.exercises.push({exerciseId:ex.id,exerciseName:ex.name,sets:isCardio?[{time:0,notes:''}]:[{weight:0,reps:0,notes:''}],isSub:false,origId:null,notes:''});closeModal();renderSession();toast(`${ex.name} añadido`,'ok');logEv('exercise_added',{name:ex.name,group:ex.group});}));
 });
 function showSubModal(xi){
