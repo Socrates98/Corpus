@@ -1133,7 +1133,7 @@ document.getElementById('btn-load-routine').addEventListener('click',()=>{
 let activeSession={exercises:[]};
 const rpShown=new Map();
 function getExAllTimeMax(exId){const ex=getExById(exId);let mw=0,m1=0;getSess().forEach(s=>{const se=s.exercises.find(e=>e.exerciseId===exId||e.exerciseName===ex?.name);if(!se)return;se.sets.forEach(st=>{mw=Math.max(mw,st.weight||0);m1=Math.max(m1,calc1RM(st.weight||0,st.reps||0));});});return{mw,m1};}
-function checkRP(xi,si){const se=activeSession.exercises[xi];if(!se)return;const s=se.sets[si];if(!s||!(s.weight>0))return;const best=getExAllTimeMax(se.exerciseId);const prevW=rpShown.get(se.exerciseId+'_w')||0;const prevR=rpShown.get(se.exerciseId+'_r')||0;let fired=false;if(s.weight>best.mw&&s.weight>prevW){rpShown.set(se.exerciseId+'_w',s.weight);fired=true;}if(s.reps>0){const cur1RM=calc1RM(s.weight,s.reps);if(cur1RM>best.m1&&cur1RM>prevR){rpShown.set(se.exerciseId+'_r',cur1RM);fired=true;}}if(fired){toast('🏆 Nuevo RP · '+se.exerciseName,'a');if(getVibrate())navigator.vibrate?.([40,20,40]);}}
+function checkRP(xi,si){const se=activeSession.exercises[xi];if(!se)return;const s=se.sets[si];if(!s||!(s.weight>0))return;const best=getExAllTimeMax(se.exerciseId);const prev=rpShown.get(se.exerciseId)||0;if(s.weight>best.mw&&s.weight>prev){rpShown.set(se.exerciseId,s.weight);toast('🏆 Nuevo RP · '+se.exerciseName,'a');if(getVibrate())navigator.vibrate?.([40,20,40]);}}
 function renderSession(){
   const container=document.getElementById('sess-list'),footer=document.getElementById('sess-footer');
   if(!activeSession.exercises.length){
