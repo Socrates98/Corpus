@@ -529,6 +529,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
         </div>
 
 
+        <div class="card mb16">
+          <div class="card-title mb8">Ayuda</div>
+          <button class="btn btn-g btn-sm" id="btn-how-help">¿Cómo usar la app?</button>
+        </div>
+
         <div class="card">
           <div class="card-title mb8">Acerca de</div>
           <p class="tsm tmut mb12">Corpus — tu compañero de entrenamiento.</p>
@@ -537,6 +542,14 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
       </section>
 
     </div>
+  </div>
+
+  <!-- HOW BAR -->
+  <div id="how-bar" hidden style="position:fixed;bottom:calc(var(--nh) + env(safe-area-inset-bottom,0px));left:0;right:0;z-index:19;padding:8px max(16px,env(safe-area-inset-left,0px));">
+    <button id="btn-how" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--a);border:none;border-radius:var(--r12);cursor:pointer;font-family:var(--fb);font-size:.92rem;font-weight:600;color:#0c0c0d;box-shadow:0 4px 20px rgba(201,247,49,.25);">
+      <span>¿Cómo empezar?</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0c0c0d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
   </div>
 
   <nav id="bnav">
@@ -808,6 +821,7 @@ function switchTab(tab){
   document.getElementById('tab-'+tab).classList.add('on');
   document.querySelector(`.nb[data-tab="${tab}"]`).classList.add('on');
   document.getElementById('mc-wrap').scrollTop=0;curTab=tab;renderTab(tab);
+  if(typeof updateHowBar==='function')updateHowBar();
   logEv('tab_view',{tab});
 }
 document.querySelectorAll('.nb').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
@@ -831,7 +845,7 @@ function launchApp(name){
   document.getElementById('hdr-user').textContent=name;
   document.getElementById('session-date').value=today();
   document.getElementById('set-name').value=name;
-  renderTab('session');initOneSignal();
+  renderTab('session');initOneSignal();updateHowBar();
 }
 function hideSplash(){
   const sp=document.getElementById('splash');if(!sp)return;
@@ -1167,12 +1181,49 @@ function flushAndSave(){
     const sessions=getSess();
     sessions.unshift({id:uid(),date,exercises:activeSession.exercises.map(se=>({exerciseId:se.exerciseId,exerciseName:se.exerciseName,notes:se.notes||'',isSub:se.isSub||false,origId:se.origId||null,sets:se.sets.filter(s=>(s.weight||0)>0||(s.reps||0)>0||(s.time||0)>0).map(s=>s.time!==undefined?{time:s.time,notes:s.notes||''}:{weight:s.weight,reps:s.reps,...(s.rir!=null?{rir:s.rir}:{}),notes:s.notes||''}),})).filter(se=>se.sets.length>0),});
     setSess(sessions);activeSession={exercises:[]};document.getElementById('session-date').value=today();
-    renderSession();toast('Sesión guardada','a');logEv('session_saved',{exercises:activeSession.exercises.length});setTimeout(()=>switchTab('history'),900);
+    if(!localStorage.getItem(HOW_KEY))localStorage.setItem(HOW_KEY,'1');
+    renderSession();toast('Sesión guardada','a');logEv('session_saved',{exercises:activeSession.exercises.length});updateHowBar();setTimeout(()=>switchTab('history'),900);
   }catch(e){console.error('Save:',e);toast('Error al guardar: '+e.message,'err');}
 }
 const _saveBtn=document.getElementById('btn-save-sess');
 _saveBtn.addEventListener('click',flushAndSave);
 _saveBtn.addEventListener('touchend',e=>{e.preventDefault();flushAndSave();});
+
+/* ── Onboarding "Cómo empezar" ── */
+const HOW_KEY='corpus_onboarded';
+function howModalHtml(){
+  return`<div class="mh"><span class="mt">¿Cómo usar Corpus?</span><button class="ico-btn" id="mc-x">✕</button></div>
+  <div class="flex fc" style="gap:20px;padding-top:4px;">
+    <div style="display:flex;gap:14px;align-items:flex-start;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--a);color:#0c0c0d;font-family:var(--ff);font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+      <div><div style="font-weight:600;margin-bottom:3px;">Empieza un entrenamiento</div><div style="font-size:.85rem;color:var(--t2);">Pulsa <strong>+ Ejercicio</strong> para añadir ejercicios o carga una <strong>Rutina</strong> guardada.</div></div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:flex-start;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--a);color:#0c0c0d;font-family:var(--ff);font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+      <div><div style="font-weight:600;margin-bottom:3px;">Registra tus series</div><div style="font-size:.85rem;color:var(--t2);">Introduce el peso y las repeticiones de cada serie. Usa <strong>+ Serie</strong> para añadir más.</div></div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:flex-start;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--a);color:#0c0c0d;font-family:var(--ff);font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+      <div><div style="font-weight:600;margin-bottom:3px;">Guarda la sesión</div><div style="font-size:.85rem;color:var(--t2);">Al terminar pulsa <strong>Guardar sesión</strong>. Tu historial y progreso se actualizarán automáticamente.</div></div>
+    </div>
+    <div style="display:flex;gap:14px;align-items:flex-start;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--s3);color:var(--t2);font-family:var(--ff);font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+      </div>
+      <div><div style="font-weight:600;margin-bottom:3px;">Crea rutinas</div><div style="font-size:.85rem;color:var(--t2);">En la pestaña <strong>Ejercicios → Rutinas</strong> puedes guardar tus entrenamientos favoritos y cargarlos rápido.</div></div>
+    </div>
+    <button class="btn btn-p btn-full" id="btn-how-close" style="font-family:var(--ff);font-weight:700;font-size:1rem;min-height:50px;">¡Entendido!</button>
+  </div>`;
+}
+function openHowModal(){openModal(howModalHtml());document.getElementById('mc-x').onclick=closeModal;document.getElementById('btn-how-close').onclick=closeModal;}
+function updateHowBar(){
+  const bar=document.getElementById('how-bar');
+  if(!bar)return;
+  const done=localStorage.getItem(HOW_KEY);
+  bar.hidden=!!(done||curTab!=='session');
+}
+document.getElementById('btn-how').addEventListener('click',openHowModal);
+document.getElementById('btn-how-help').addEventListener('click',openHowModal);
 
 /* ═══ 12. HISTORIAL ═══ */
 let _calY=null,_calM=null;
