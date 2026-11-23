@@ -781,12 +781,22 @@ async function loadFromFS(uid){
       if(d.routines?.length)S.set('gym_routines',d.routines);
       _noSync=false;return true;
     }
-  }catch(e){console.warn('Load:',e);}
-  _noSync=false;return false;
+    // doc doesn't exist — genuinely new user, safe to migrate
+    _noSync=false;return null;
+  }catch(e){
+    console.warn('Load:',e);
+    // error reading Firestore — do NOT migrate, could overwrite existing cloud data
+    _noSync=false;return false;
+  }
 }
 async function migrateLocalToFS(uid){
   const local={name:S.get('gym_user',''),exercises:S.get('gym_exercises',null)||DEFAULT_EX,sessions:S.get('gym_sessions',[]),routines:S.get('gym_routines',[])};
-  try{await db.collection('users').doc(uid).set({...local,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});}catch(e){console.warn('Migrate:',e);}
+  try{
+    // Double-check the doc still doesn't exist before writing
+    const check=await db.collection('users').doc(uid).get();
+    if(check.exists)return;
+    await db.collection('users').doc(uid).set({...local,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(e){console.warn('Migrate:',e);}
 }
 
 /* ═══ 3. UTILS ═══ */
@@ -975,8 +985,10 @@ function boot(){
       hideSplash();
     }
     if(user){
-      const hasData=await loadFromFS(user.uid);
-      if(!hasData)await migrateLocalToFS(user.uid);
+      const loadResult=await loadFromFS(user.uid);
+      // null = new user (doc doesn't exist), migrate local data
+      // false = Firestore error, skip migration to avoid overwriting cloud data
+      if(loadResult===null)await migrateLocalToFS(user.uid);
       const name=getUser()||user.displayName||user.email.split('@')[0];
       if(!getUser()){_noSync=true;S.set('gym_user',name);_noSync=false;}
       document.getElementById('app').hidden=false;
