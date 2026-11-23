@@ -80,7 +80,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .nb svg{transition:transform .18s;}
 .nb.on{color:var(--at);}
 .nb.on svg{transform:scale(1.1);}
-.nb.on::after{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:2.5px;border-radius:2px;background:var(--a);}
+#nav-pill{position:absolute;top:0;left:0;width:28px;height:2.5px;border-radius:2px;background:var(--a);pointer-events:none;transition:transform .28s cubic-bezier(.4,0,.2,1);}
 
 /* ══ FORMS ══ */
 .fg{display:flex;flex-direction:column;gap:6px;}
@@ -572,6 +572,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
   </div>
 
   <nav id="bnav">
+    <div id="nav-pill"></div>
     <button class="nb on" data-tab="session">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><line x1="6" y1="12" x2="18" y2="12"/><rect x="8" y="7" width="2" height="10" rx="1"/><rect x="14" y="7" width="2" height="10" rx="1"/></svg>
       <span>Sesión</span>
@@ -846,11 +847,19 @@ box.addEventListener('touchcancel',()=>{act=false;box.style.transform='';box.sty
 
 /* ═══ 7. NAV ═══ */
 let curTab='session',exFilter='all',exSearch='',exSeg='ex-panel',progSeg='by-ex';
+function movePill(tab){
+  const btn=document.querySelector(`.nb[data-tab="${tab}"]`);
+  const pill=document.getElementById('nav-pill');
+  if(!btn||!pill)return;
+  const x=btn.offsetLeft+btn.offsetWidth/2-14;
+  pill.style.transform=`translateX(${x}px)`;
+}
 function switchTab(tab){
   document.querySelectorAll('.tab').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   document.getElementById('tab-'+tab).classList.add('on');
   document.querySelector(`.nb[data-tab="${tab}"]`).classList.add('on');
+  movePill(tab);
   document.getElementById('mc-wrap').scrollTop=0;curTab=tab;renderTab(tab);
   if(typeof updateHowBar==='function')updateHowBar();
   logEv('tab_view',{tab});
@@ -877,6 +886,8 @@ function launchApp(name){
   document.getElementById('session-date').value=today();
   document.getElementById('set-name').value=name;
   renderTab('session');initOneSignal();updateHowBar();
+  // position pill on the initial tab (needs layout, so requestAnimationFrame)
+  requestAnimationFrame(()=>movePill('session'));
 }
 function hideSplash(){
   const sp=document.getElementById('splash');if(!sp)return;
