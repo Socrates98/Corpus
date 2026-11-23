@@ -438,7 +438,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
 
       <!-- HISTORIAL -->
       <section id="tab-history" class="tab">
-        <div class="sh"><span class="sh-title">Historial</span></div>
+        <div class="sh"><span class="sh-title">Historial</span><button class="btn btn-g btn-sm" id="btn-add-past">+ Añadir sesión</button></div>
         <div id="hist-cal"></div>
         <div id="hist-list"></div>
       </section>
@@ -1300,6 +1300,24 @@ function viewSession(id){
     ${s.exercises.map(ex=>{const isC=ex.sets.length>0&&ex.sets[0].time!==undefined;return`<div class="mb16"><div style="font-family:var(--ff);font-weight:700;margin-bottom:8px;">${ex.isSub?`<span class="sub-badge" style="margin-right:5px">↔</span>`:''}${esc(ex.exerciseName)}</div><div style="background:var(--s2);border-radius:var(--r8);overflow:hidden;"><table class="sets-tbl"><thead><tr><th>#</th>${isC?'<th>Duración</th>':'<th>Kg</th><th>Reps</th>'}</tr></thead><tbody>${ex.sets.map((s,i)=>`<tr><td class="set-n">${i+1}</td>${isC?`<td class="fnum">${s.time||0} min</td>`:`<td class="fnum">${s.weight}</td><td class="fnum">${s.reps}${s.rir!=null?` <span style="font-size:.72em;color:var(--ok);">RIR${s.rir}</span>`:''}</td>`}</tr>`).join('')}</tbody></table></div>${ex.notes?`<p class="tsm tmut mt8">${esc(ex.notes)}</p>`:''}</div>`;}).join('')}`);
   document.getElementById('mc-x').onclick=closeModal;
 }
+
+document.getElementById('btn-add-past').addEventListener('click',()=>{
+  openModal(`<div class="mh"><span class="mt">Registrar sesión pasada</span><button class="ico-btn" id="mc-x">✕</button></div>
+    <div class="flex fc gap16" style="padding-top:4px;">
+      <div class="fg"><label class="fl">Fecha</label><input type="date" id="past-date" max="${today()}" value="${today()}" style="width:100%;"></div>
+      <button class="btn btn-p btn-full" id="btn-past-go">Continuar →</button>
+    </div>`);
+  document.getElementById('mc-x').onclick=closeModal;
+  document.getElementById('btn-past-go').onclick=()=>{
+    const d=document.getElementById('past-date').value;
+    if(!d||d>today()){toast('Elige una fecha pasada o de hoy','err');return;}
+    if(activeSession.exercises.length){toast('Termina o descarta el entreno actual primero','err');return;}
+    closeModal();
+    document.getElementById('session-date').value=d;
+    switchTab('session');
+    toast('Sesión del '+fmtDate(d).replace(/^\w/,c=>c.toUpperCase()));
+  };
+});
 
 /* ═══ 13. PROGRESO ═══ */
 let chW=null,ch1=null,chV=null,_rtCharts=[];
