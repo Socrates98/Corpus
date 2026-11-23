@@ -134,7 +134,8 @@ small{font-size:.78rem;color:var(--t2);}
 
 /* ══ SESION ══ */
 .sess-top{display:flex;align-items:center;gap:8px;margin-bottom:22px;flex-wrap:wrap;justify-content:flex-end;}
-.sess-date-lbl{flex:1;font-size:.82rem;color:var(--t2);font-weight:500;}
+.sess-date-lbl{flex:1;font-size:.82rem;color:var(--t2);font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:5px;user-select:none;}
+.sess-date-lbl:active{opacity:.7;}
 @keyframes rowFlash{0%{background:rgba(201,247,49,.18);}100%{background:transparent;}}
 .row-flash{animation:rowFlash .6s ease-out;}
 #sess-footer{position:sticky;bottom:0;background:var(--bg);padding:8px max(20px,env(safe-area-inset-left,0px));border-top:1px solid var(--b);z-index:25;}
@@ -1287,7 +1288,21 @@ function flushAndSave(){
   }catch(e){console.error('Save:',e);toast('Error al guardar: '+e.message,'err');}
 }
 function flashRow(xi,si){const r=document.getElementById(`sr-${xi}-${si}`);if(!r)return;r.classList.remove('row-flash');void r.offsetWidth;r.classList.add('row-flash');}
-function renderSessDateLabel(){const d=document.getElementById('session-date').value;const lbl=document.getElementById('sess-date-lbl');if(!lbl)return;const isToday=!d||d===today();lbl.textContent=isToday?'Hoy':fmtDate(d).replace(/^\w/,c=>c.toUpperCase());}
+function renderSessDateLabel(){
+  const d=document.getElementById('session-date').value;
+  const lbl=document.getElementById('sess-date-lbl');
+  if(!lbl)return;
+  const isToday=!d||d===today();
+  const txt=isToday?'Hoy':fmtDate(d).replace(/^\w/,c=>c.toUpperCase());
+  lbl.innerHTML=`${txt}<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.5;flex-shrink:0;"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>`;
+}
+document.getElementById('sess-date-lbl').addEventListener('click',()=>{
+  const inp=document.getElementById('session-date');
+  inp.max=today();
+  inp.showPicker?.();
+  inp.click();
+});
+document.getElementById('session-date').addEventListener('change',renderSessDateLabel);
 const _saveBtn=document.getElementById('btn-save-sess');
 _saveBtn.addEventListener('click',flushAndSave);
 _saveBtn.addEventListener('touchend',e=>{e.preventDefault();flushAndSave();});
