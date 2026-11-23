@@ -425,7 +425,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
           <button class="seg-b" data-seg="rt-panel">Rutinas</button>
         </div>
         <div id="ex-panel">
-          <div class="sh"><span class="sh-title">Ejercicios</span><button class="btn btn-p btn-sm" id="btn-new-ex">+ Nuevo</button></div>
+          <div class="sh"><span class="sh-title">Ejercicios</span><button class="ico-btn" id="btn-ex-search" style="font-size:1.1rem;color:var(--t2);margin-right:4px;" title="Buscar">🔍</button><button class="btn btn-p btn-sm" id="btn-new-ex">+ Nuevo</button></div>
+          <div id="ex-search-wrap" hidden style="margin-bottom:10px;"><input id="ex-q" type="text" placeholder="Buscar ejercicio..." autocomplete="off" style="width:100%;background:var(--s2);border:1px solid var(--b);border-radius:var(--r8);padding:9px 12px;color:var(--t);font-size:.95rem;font-family:var(--fb);outline:none;"></div>
           <div id="ex-filter"></div>
           <div id="ex-list"></div>
         </div>
@@ -834,7 +835,7 @@ box.addEventListener('touchcancel',()=>{act=false;box.style.transform='';box.sty
 })();
 
 /* ═══ 7. NAV ═══ */
-let curTab='session',exFilter='all',exSeg='ex-panel',progSeg='by-ex';
+let curTab='session',exFilter='all',exSearch='',exSeg='ex-panel',progSeg='by-ex';
 function switchTab(tab){
   document.querySelectorAll('.tab').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
@@ -1001,7 +1002,8 @@ function renderExercises(filter){
   const groups=['all',...GROUPS.filter(g=>exercises.some(e=>e.group===g))];
   bar.innerHTML=groups.map(g=>`<button class="fchip ${g===exFilter?'c-lime':'c-muted'}" data-fg="${g}">${g==='all'?'Todos':g}</button>`).join('');
   bar.querySelectorAll('[data-fg]').forEach(b=>b.addEventListener('click',()=>renderExercises(b.dataset.fg)));
-  const list=exFilter==='all'?exercises:exercises.filter(e=>e.group===exFilter);
+  const q=exSearch.trim().toLowerCase();
+  const list=exercises.filter(e=>(exFilter==='all'||e.group===exFilter)&&(!q||e.name.toLowerCase().includes(q)));
   if(!list.length){container.innerHTML=`<div class="empty"><div class="empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="1.4" stroke-linecap="round"><rect x="8" y="3" width="8" height="18" rx="2"/><line x1="3" y1="9" x2="8" y2="9"/><line x1="16" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="8" y2="15"/><line x1="16" y1="15" x2="21" y2="15"/></svg></div><div class="empty-t">Sin ejercicios</div><p class="empty-s">Pulsa "+ Nuevo" para añadir</p></div>`;return;}
   container.innerHTML=list.map(ex=>{
     const vurl=ex.videoUrl||`https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name+' técnica')}`;
@@ -1012,6 +1014,13 @@ function renderExercises(filter){
   container.querySelectorAll('[data-action="del"]').forEach(b=>b.addEventListener('click',()=>{const ex=getExById(b.dataset.eid);confirmAction(`¿Borrar "${ex?.name}"?`,()=>deleteEx(b.dataset.eid));}));
 }
 document.getElementById('btn-new-ex').addEventListener('click',()=>showExModal());
+document.getElementById('btn-ex-search').addEventListener('click',()=>{
+  const wrap=document.getElementById('ex-search-wrap');
+  wrap.hidden=!wrap.hidden;
+  if(!wrap.hidden){const inp=document.getElementById('ex-q');inp.value='';exSearch='';inp.focus();}
+  else{exSearch='';renderExercises();}
+});
+document.getElementById('ex-q').addEventListener('input',e=>{exSearch=e.target.value;renderExercises();});
 function showExModal(id=null){
   const exercises=getEx()||DEFAULT_EX;const ex=id?exercises.find(e=>e.id===id):null;
   openModal(`<div class="mh"><span class="mt">${ex?'Editar ejercicio':'Nuevo ejercicio'}</span><button class="ico-btn" id="mc-x">✕</button></div>
