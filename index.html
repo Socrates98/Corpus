@@ -997,7 +997,8 @@ function renderExercises(filter){
   if(!list.length){container.innerHTML=`<div class="empty"><div class="empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="1.4" stroke-linecap="round"><rect x="8" y="3" width="8" height="18" rx="2"/><line x1="3" y1="9" x2="8" y2="9"/><line x1="16" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="8" y2="15"/><line x1="16" y1="15" x2="21" y2="15"/></svg></div><div class="empty-t">Sin ejercicios</div><p class="empty-s">Pulsa "+ Nuevo" para añadir</p></div>`;return;}
   container.innerHTML=list.map(ex=>{
     const vurl=ex.videoUrl||`https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name+' técnica')}`;
-    return`<div class="card mb12"><div style="display:flex;align-items:center;gap:10px;"><div style="flex:1;min-width:0;"><div class="card-title">${esc(ex.name)}</div><div class="card-meta mt8"><span class="chip c-lime">${esc(ex.group)}</span><span class="chip c-muted">${esc(ex.material)}</span></div>${ex.alternatives?.length?`<p class="tsm tmut mt8"><strong>Alt:</strong> ${ex.alternatives.map(esc).join(' · ')}</p>`:''}</div><div style="display:flex;gap:5px;flex-shrink:0;align-items:center;"><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:0;min-height:30px;width:32px;"><svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor"><polygon points="1,0.5 9.5,6 1,11.5"/></svg></a><button class="ico-btn" data-eid="${ex.id}" data-action="edit">✏️</button><button class="ico-btn" data-eid="${ex.id}" data-action="del">🗑️</button></div></div></div>`;
+    const isDefault=DEFAULT_IDS.has(ex.id);
+    return`<div class="card mb12"><div style="display:flex;align-items:center;gap:10px;"><div style="flex:1;min-width:0;"><div class="card-title">${esc(ex.name)}</div><div class="card-meta mt8"><span class="chip c-lime">${esc(ex.group)}</span><span class="chip c-muted">${esc(ex.material)}</span>${isDefault?'<span class="chip c-muted" style="opacity:.6;">predefinido</span>':''}</div>${ex.alternatives?.length?`<p class="tsm tmut mt8"><strong>Alt:</strong> ${ex.alternatives.map(esc).join(' · ')}</p>`:''}</div><div style="display:flex;gap:5px;flex-shrink:0;align-items:center;"><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:0;min-height:30px;width:32px;"><svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor"><polygon points="1,0.5 9.5,6 1,11.5"/></svg></a><button class="ico-btn" data-eid="${ex.id}" data-action="edit">✏️</button>${isDefault?'':`<button class="ico-btn" data-eid="${ex.id}" data-action="del">🗑️</button>`}</div></div></div>`;
   }).join('');
   container.querySelectorAll('[data-action="edit"]').forEach(b=>b.addEventListener('click',()=>showExModal(b.dataset.eid)));
   container.querySelectorAll('[data-action="del"]').forEach(b=>b.addEventListener('click',()=>{const ex=getExById(b.dataset.eid);confirmAction(`¿Borrar "${ex?.name}"?`,()=>deleteEx(b.dataset.eid));}));
@@ -1011,7 +1012,7 @@ function showExModal(id=null){
       <div class="flex gap8"><div class="fg" style="flex:1;"><label class="fl">Grupo *</label><select id="ei-g">${GROUPS.map(g=>`<option value="${g}"${ex?.group===g?' selected':''}>${g}</option>`).join('')}</select></div><div class="fg" style="flex:1;"><label class="fl">Material *</label><select id="ei-m">${MATERIALS.map(m=>`<option value="${m}"${ex?.material===m?' selected':''}>${m}</option>`).join('')}</select></div></div>
       <div class="fg"><label class="fl">Vídeo (opcional)</label><input id="ei-v" type="url" value="${ex?.videoUrl?esc(ex.videoUrl):''}" placeholder="https://youtube.com/..."></div>
       <div class="fg"><label class="fl">Alternativas (una por línea)</label><textarea id="ei-a" rows="3">${ex?.alternatives?.join('\n')||''}</textarea></div>
-      <div style="display:flex;gap:8px;">${ex?`<button class="btn btn-d btn-sm" id="ei-del">Borrar</button>`:''}<button class="btn btn-p" id="ei-save" style="flex:1;">${ex?'Guardar cambios':'Añadir'}</button></div>
+      <div style="display:flex;gap:8px;">${ex&&!DEFAULT_IDS.has(ex.id)?`<button class="btn btn-d btn-sm" id="ei-del">Borrar</button>`:''}<button class="btn btn-p" id="ei-save" style="flex:1;">${ex?'Guardar cambios':'Añadir'}</button></div>
     </div>`);
   document.getElementById('mc-x').onclick=closeModal;
   document.getElementById('ei-save').onclick=()=>{
@@ -1026,7 +1027,14 @@ function showExModal(id=null){
   };
   const db=document.getElementById('ei-del');if(db)db.onclick=()=>confirmAction(`¿Borrar "${ex.name}"?`,()=>{deleteEx(id);closeModal();});
 }
-function deleteEx(id){setEx((getEx()||[]).filter(e=>e.id!==id));renderExercises();toast('Eliminado');}
+const DEFAULT_IDS=new Set(DEFAULT_EX.map(e=>e.id));
+function deleteEx(id){
+  if(DEFAULT_IDS.has(id)){toast('No se pueden eliminar los ejercicios predefinidos','err');return;}
+  const usedInSess=getSess().some(s=>s.exercises.some(e=>e.exerciseId===id));
+  const doDelete=()=>{setEx((getEx()||[]).filter(e=>e.id!==id));renderExercises();toast('Eliminado');};
+  if(usedInSess)confirmAction('Este ejercicio tiene sesiones guardadas. ¿Borrar igualmente?',doDelete);
+  else doDelete();
+}
 
 /* ═══ 10. RUTINAS ═══ */
 function renderRoutines(){
