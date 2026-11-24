@@ -222,6 +222,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
 .cal-day.today{background:var(--s3);color:var(--t);font-weight:700;}
 .cal-day.has-sess{color:var(--t);cursor:pointer;}
 .cal-day.has-sess:active{background:var(--a2);}
+.cal-day.future{color:var(--t3);opacity:.35;pointer-events:none;}
 .cal-c{width:16px;height:16px;background:var(--a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--ff);font-weight:900;font-size:.58rem;color:var(--af);line-height:1;flex-shrink:0;}
 
 /* ══ EMPTY ══ */
@@ -541,9 +542,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
           <div class="card-title mb8">Recordatorios push</div>
           <p class="tsm tmut mb12">Recibe recordatorios para entrenar directamente en tu iPhone.</p>
           <div id="ios-warn" hidden style="background:var(--wa2);border:1px solid var(--wa);border-radius:var(--r8);padding:10px 12px;margin-bottom:12px;font-size:.82rem;color:var(--wa);">⚠️ Añade a pantalla de inicio primero: <strong>Compartir → Añadir a pantalla de inicio</strong></div>
-          <div class="ns-box ns-idle" id="ns-box"><span id="ns-dot">⚪</span><span id="ns-txt">Sin activar</span></div>
-          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-            <button class="btn btn-p btn-sm" id="btn-notif-on">Activar</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;">
+            <div class="ns-box ns-idle" id="ns-box" style="margin:0;"><span id="ns-dot">⚪</span><span id="ns-txt">Sin activar</span></div>
+            <label class="tog-sw"><input type="checkbox" id="notif-chk"><span class="tog-track"></span></label>
+          </div>
+          <div style="margin-top:10px;">
             <button class="btn btn-g btn-sm" id="btn-notif-help">¿Cómo activar?</button>
           </div>
         </div>
@@ -583,7 +586,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
       <span>Ejercicios</span>
     </button>
     <button class="nb" data-tab="history">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2.5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="7" y1="14" x2="10" y2="14"/><line x1="7" y1="18" x2="10" y2="18"/><line x1="14" y1="14" x2="17" y2="14"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2.5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="7" y1="13.5" x2="10" y2="13.5"/><line x1="7" y1="17.5" x2="10" y2="17.5"/><line x1="14" y1="13.5" x2="17" y2="13.5"/><line x1="14" y1="17.5" x2="17" y2="17.5"/></svg>
       <span>Historial</span>
     </button>
     <button class="nb" data-tab="progress">
@@ -1207,10 +1210,11 @@ function renderSession(){
   const showRIR=getShowRIR();
   const notesStyle='flex:2;font-size:1rem;min-height:38px;padding:8px 10px;background:var(--s3);border-radius:var(--r8);border:1px solid transparent;color:var(--t);outline:none;touch-action:manipulation;';
   container.innerHTML=activeSession.exercises.map((se,xi)=>{
-    const ex=getExById(se.exerciseId)||{name:se.exerciseName,group:'?',material:'?',videoUrl:''};
+    const ex=getExById(se.exerciseId)||{name:se.exerciseName,group:'?',material:'',videoUrl:''};
     const isCardio=ex.group==='Cardio';
+    const isBW=ex.material==='Peso corporal'||se.noWeight;
     const vurl=ex.videoUrl||`https://www.youtube.com/results?search_query=${encodeURIComponent(se.exerciseName+' técnica')}`;
-    const hdr=`<div class="sex-hdr"><button class="drag-handle" title="Mover">⠿</button><div class="sex-name">${esc(se.exerciseName)}${se.isSub?` <span class="sub-badge">Sust.</span>`:''}</div><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:6px 10px;min-height:34px;display:inline-flex;align-items:center;justify-content:center;" title="Ver técnica"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></a>${isCardio?'':`<button class="btn btn-s btn-sm" data-sub="${xi}" style="padding:6px 11px;min-height:34px;font-size:.78rem;">No puedo</button><button class="btn btn-s btn-sm${se.noWeight?' on':''}" data-nw="${xi}" style="padding:6px 10px;min-height:34px;font-size:.75rem;" title="Sin peso (peso corporal)">PC</button><button class="ico-btn" data-info-pc style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:.8rem;padding:0 2px;min-height:0;" title="¿Qué es PC?">ⓘ</button>`}<button class="ico-btn" data-dex="${xi}" style="font-size:.8rem;">✕</button></div>`;
+    const hdr=`<div class="sex-hdr"><button class="drag-handle" title="Mover">⠿</button><div class="sex-name">${esc(se.exerciseName)}${se.isSub?` <span class="sub-badge">Sust.</span>`:''}</div><a href="${vurl}" target="_blank" rel="noopener" class="btn btn-g btn-sm" style="text-decoration:none;padding:6px 10px;min-height:34px;display:inline-flex;align-items:center;justify-content:center;" title="Ver técnica"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></a>${isCardio?'':`<button class="btn btn-s btn-sm" data-sub="${xi}" style="padding:6px 11px;min-height:34px;font-size:.78rem;">No puedo</button>${isBW?`<button class="btn btn-s btn-sm${se.noWeight?' on':''}" data-nw="${xi}" style="padding:6px 10px;min-height:34px;font-size:.75rem;" title="Sin peso (peso corporal)">PC</button><button class="ico-btn" data-info-pc style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:.8rem;padding:0 2px;min-height:0;" title="¿Qué es PC?">ⓘ</button>`:''}`}<button class="ico-btn" data-dex="${xi}" style="font-size:.8rem;">✕</button></div>`;
     if(isCardio){
       const t=se.sets[0]?.time||0;
       return`<div class="sex-card">${hdr}<div style="overflow-x:auto;"><table class="sets-tbl"><thead><tr><th>Duración</th></tr></thead><tbody><tr><td><div style="display:inline-flex;align-items:center;gap:2px;"><button class="step-btn" data-xi="${xi}" data-cdelta="-5">−5</button><input type="number" class="set-inp cardio-t" min="0" max="300" step="1" value="${t||''}" placeholder="0" data-xi="${xi}" style="width:72px;text-align:center;"><button class="step-btn" data-xi="${xi}" data-cdelta="5">+5</button></div><span style="color:var(--t2);font-size:.8rem;margin-left:6px;">min</span></td></tr></tbody></table></div><div class="sex-add"><input type="text" placeholder="Notas..." id="snotes-${xi}" value="${esc(se.notes||'')}" style="${notesStyle}" /></div></div>`;
@@ -1224,7 +1228,7 @@ function renderSession(){
   container.querySelectorAll('[data-cdelta]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const xi=+btn.dataset.xi,delta=+btn.dataset.cdelta;const t=Math.max(0,(activeSession.exercises[xi].sets[0]?.time||0)+delta);if(!activeSession.exercises[xi].sets[0])activeSession.exercises[xi].sets[0]={notes:''};activeSession.exercises[xi].sets[0].time=t;const inp=btn.closest('div').querySelector('.cardio-t');if(inp)inp.value=t||'';}));
   container.querySelectorAll('[data-f]').forEach(inp=>{const h=e=>{const xi=+e.target.dataset.xi,si=+e.target.dataset.si,f=e.target.dataset.f;const v=e.target.value;activeSession.exercises[xi].sets[si][f]=f==='rir'?(v===''?null:parseInt(v)):parseFloat(v)||0;checkRP(xi,si);};inp.addEventListener('input',h);inp.addEventListener('change',h);inp.addEventListener('focus',e=>{const td=e.target.closest('td');const colIdx=td?[...td.parentElement.children].indexOf(td):-1;const tbl=e.target.closest('table');if(tbl&&colIdx>=0)tbl.querySelectorAll('thead th').forEach((th,i)=>th.classList.toggle('col-active',i===colIdx));});inp.addEventListener('blur',e=>{const xi=+e.target.dataset.xi,si=+e.target.dataset.si;flashRow(xi,si);const tbl=e.target.closest('table');if(tbl)tbl.querySelectorAll('thead th').forEach(th=>th.classList.remove('col-active'));});});
   container.querySelectorAll('.step-btn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const xi=+btn.dataset.xi,si=+btn.dataset.si,f=btn.dataset.f,delta=+btn.dataset.delta;const cur=f==='rir'?(activeSession.exercises[xi].sets[si].rir??0):(activeSession.exercises[xi].sets[si][f]||0);let v=Math.max(0,cur+delta);if(f==='rir')v=Math.min(10,v);else v=Math.min(999,v);if(f==='rir')activeSession.exercises[xi].sets[si].rir=v;else activeSession.exercises[xi].sets[si][f]=v;const inp=btn.closest('div').querySelector('input');if(inp)inp.value=v;if(getVibrate())navigator.vibrate?.(6);checkRP(xi,si);flashRow(xi,si);}));
-  container.querySelectorAll('[data-aset]').forEach(btn=>btn.addEventListener('click',e=>{const xi=+e.target.dataset.aset;const last=activeSession.exercises[xi].sets.at(-1)||{weight:0,reps:0,rir:null,notes:''};activeSession.exercises[xi].sets.push({weight:last.weight,reps:last.reps,rir:null,notes:''});if(getVibrate())navigator.vibrate?.(10);renderSession();}));
+  container.querySelectorAll('[data-aset]').forEach(btn=>btn.addEventListener('click',e=>{const xi=+e.target.dataset.aset;activeSession.exercises[xi].sets.push({weight:0,reps:0,rir:null,notes:''});if(getVibrate())navigator.vibrate?.(10);renderSession();}));
   container.querySelectorAll('[data-rpt]').forEach(btn=>btn.addEventListener('click',e=>{const[xi,si]=e.target.dataset.rpt.split('-').map(Number);activeSession.exercises[xi].sets.push({...activeSession.exercises[xi].sets[si]});renderSession();}));
   container.querySelectorAll('[data-dset]').forEach(btn=>btn.addEventListener('click',e=>{const[xi,si]=e.target.dataset.dset.split('-').map(Number);activeSession.exercises[xi].sets.splice(si,1);if(!activeSession.exercises[xi].sets.length)activeSession.exercises[xi].sets.push({weight:0,reps:0,notes:''});renderSession();}));
   container.querySelectorAll('[data-dex]').forEach(btn=>btn.addEventListener('click',e=>{activeSession.exercises.splice(+e.target.dataset.dex,1);renderSession();}));
@@ -1248,6 +1252,7 @@ function renderSession(){
       onEnd:evt=>{if(evt.oldIndex===evt.newIndex)return;const m=activeSession.exercises.splice(evt.oldIndex,1)[0];activeSession.exercises.splice(evt.newIndex,0,m);renderSession();}
     });
   }
+  if(typeof updateHowBar==='function')updateHowBar();
 }
 document.getElementById('btn-add-ex').addEventListener('click',()=>{
   const exercises=getEx()||DEFAULT_EX;const groups=[...new Set(exercises.map(e=>e.group))];
@@ -1260,7 +1265,7 @@ document.getElementById('btn-add-ex').addEventListener('click',()=>{
   document.getElementById('ae-grp').onchange=filterList;
   document.getElementById('ae-q').addEventListener('input',filterList);
   setTimeout(()=>document.getElementById('ae-q')?.focus(),80);
-  document.querySelectorAll('[data-aeid]').forEach(item=>item.addEventListener('click',()=>{const ex=getExById(item.dataset.aeid);if(!ex)return;const isCardio=ex.group==='Cardio';activeSession.exercises.push({exerciseId:ex.id,exerciseName:ex.name,sets:isCardio?[{time:0,notes:''}]:[{weight:0,reps:0,notes:''}],isSub:false,origId:null,notes:''});closeModal();renderSession();toast(`${ex.name} añadido`,'ok');logEv('exercise_added',{name:ex.name,group:ex.group});}));
+  document.querySelectorAll('[data-aeid]').forEach(item=>item.addEventListener('click',()=>{const ex=getExById(item.dataset.aeid);if(!ex)return;const isCardio=ex.group==='Cardio';activeSession.exercises.unshift({exerciseId:ex.id,exerciseName:ex.name,sets:isCardio?[{time:0,notes:''}]:[{weight:0,reps:0,notes:''}],isSub:false,origId:null,notes:''});closeModal();renderSession();document.getElementById('sess-list').scrollTop=0;toast(`${ex.name} añadido`,'ok');logEv('exercise_added',{name:ex.name,group:ex.group});}));
 });
 function showSubModal(xi){
   const se=activeSession.exercises[xi];const ex=getExById(se.exerciseId);const exercises=getEx()||DEFAULT_EX;
@@ -1366,7 +1371,7 @@ function updateHowBar(){
   const bar=document.getElementById('how-bar');
   if(!bar)return;
   const done=localStorage.getItem(HOW_KEY);
-  bar.hidden=!!(done||curTab!=='session');
+  bar.hidden=!!(done||curTab!=='session'||activeSession.exercises.length>0);
 }
 document.getElementById('btn-how').addEventListener('click',openHowModal);
 document.getElementById('btn-how-help').addEventListener('click',openHowModal);
@@ -1387,16 +1392,16 @@ function renderCalendar(sessions){
   for(let i=0;i<firstDow;i++)cells+=`<div></div>`;
   for(let d=1;d<=daysInMonth;d++){
     const ds=`${_calY}-${String(_calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isToday=ds===todayStr,hasSess=sessDates.has(ds);
-    cells+=`<div class="cal-day${isToday?' today':''}${hasSess?' has-sess':''}"${hasSess?` data-cd="${ds}"`:''}><span>${d}</span>${hasSess?`<div class="cal-c">C</div>`:''}</div>`;
+    const isToday=ds===todayStr,hasSess=sessDates.has(ds),isFuture=ds>todayStr;
+    cells+=`<div class="cal-day${isToday?' today':''}${hasSess?' has-sess':''}${isFuture?' future':''}"${hasSess&&!isFuture?` data-cd="${ds}"`:''}><span>${d}</span>${hasSess&&!isFuture?`<div class="cal-c">C</div>`:''}</div>`;
   }
   const calEl=document.getElementById('hist-cal');
   calEl.innerHTML=`<div class="cal-wrap"><div class="cal-nav"><button class="cal-nav-btn" id="cal-prev">‹</button><span class="cal-month">${MONTHS[_calM]} ${_calY}</span><button class="cal-nav-btn" id="cal-next">›</button></div><div class="cal-grid">${DOWS.map(d=>`<div class="cal-dow">${d}</div>`).join('')}${cells}</div></div>`;
   document.getElementById('cal-prev').onclick=()=>{_calM--;if(_calM<0){_calM=11;_calY--;}renderCalendar(getSess());};
   document.getElementById('cal-next').onclick=()=>{_calM++;if(_calM>11){_calM=0;_calY++;}renderCalendar(getSess());};
   calEl.querySelectorAll('[data-cd]').forEach(el=>el.addEventListener('click',()=>{
-    const card=document.querySelector(`[data-sid="${el.dataset.cd}"]`);
-    if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
+    const sess=getSess().find(s=>s.date===el.dataset.cd);
+    if(sess)viewSession(sess.id);
   }));
 }
 function renderHistory(){
@@ -1593,6 +1598,7 @@ function refreshNotifStatus(){
   if(p==='granted'){box.classList.add('ns-ok');dot.textContent='🟢';txt.textContent='Activadas';}
   else if(p==='denied'){box.classList.add('ns-er');dot.textContent='🔴';txt.textContent='Bloqueadas (actívalas en Ajustes)';}
   else{box.classList.add('ns-idle');dot.textContent='⚪';txt.textContent='Sin activar';}
+  const chk=document.getElementById('notif-chk');if(chk)chk.checked=(p==='granted');
 }
 function initOneSignal(){
   window.OneSignalDeferred=window.OneSignalDeferred||[];
@@ -1601,13 +1607,13 @@ function initOneSignal(){
     }catch(e){console.warn('OneSignal:',e);}refreshNotifStatus();
   });
 }
-document.getElementById('btn-notif-on').addEventListener('click',async()=>{
+document.getElementById('notif-chk').addEventListener('change',async function(){
   const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  if(ios&&window.navigator.standalone!==true){toast('Añade la app a la pantalla de inicio primero','err');return;}
-  if(typeof Notification==='undefined'){toast('Navegador no soportado','err');return;}
-  if(Notification.permission==='denied'){toast('Bloqueadas — actívalas en Ajustes del iPhone','err');return;}
+  if(ios&&window.navigator.standalone!==true){this.checked=false;toast('Añade la app a la pantalla de inicio primero','err');return;}
+  if(typeof Notification==='undefined'){this.checked=false;toast('Navegador no soportado','err');return;}
+  if(Notification.permission==='denied'){this.checked=false;toast('Bloqueadas — actívalas en Ajustes del iPhone','err');return;}
   try{if(window.OneSignal?.Notifications)await window.OneSignal.Notifications.requestPermission();else await Notification.requestPermission();refreshNotifStatus();if(Notification.permission==='granted')toast('¡Recordatorios activados!','a');}
-  catch{toast('No se pudo activar','err');}
+  catch{this.checked=false;toast('No se pudo activar','err');}
 });
 document.getElementById('btn-notif-help').addEventListener('click',()=>{
   const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
