@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 
 <style>
 /* ══ TOKENS ══ */
@@ -77,9 +78,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* ══ BOTTOM NAV ══ */
 #bnav{flex-shrink:0;z-index:20;background:var(--s1);border-top:1px solid var(--b);display:flex;height:calc(var(--nh)+env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.38);font-size:.57rem;font-family:var(--fb);font-weight:600;letter-spacing:.03em;min-height:44px;transition:color .18s;position:relative;padding-top:3px;}
+.nb-ico{font-size:22px;line-height:1;transition:transform .18s;}
 .nb svg{transition:transform .18s;}
 .nb.on{color:var(--at);}
-.nb.on svg{transform:scale(1.1);}
+.nb.on .nb-ico,.nb.on svg{transform:scale(1.1);}
+.nb[data-tab="session"]{flex:none;width:72px;border-radius:14px;background:rgba(201,247,49,.07);margin:5px 2px;padding:5px 0;}
+.nb[data-tab="session"] .nb-ico{font-size:26px;}
+.nb[data-tab="session"].on{background:rgba(201,247,49,.14);}
 #nav-pill{position:absolute;top:0;left:0;width:28px;height:2.5px;border-radius:2px;background:var(--a);pointer-events:none;transition:transform .28s cubic-bezier(.4,0,.2,1);}
 
 /* ══ FORMS ══ */
@@ -164,6 +169,8 @@ input[type="number"]{-moz-appearance:textfield;}
 input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) invert(1);opacity:.5;cursor:pointer;}
 :root[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator{filter:none;opacity:.6;}
 :root[data-theme="light"] .nb{color:rgba(0,0,0,.35);}
+:root[data-theme="light"] .nb[data-tab="session"]{background:rgba(90,120,0,.07);}
+:root[data-theme="light"] .nb[data-tab="session"].on{background:rgba(90,120,0,.13);}
 .set-acts{display:flex;gap:5px;align-items:center;}
 .sex-add{padding:12px 16px;display:flex;gap:10px;align-items:stretch;border-top:1px solid var(--b);}
 
@@ -582,24 +589,24 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
 
   <nav id="bnav">
     <div id="nav-pill"></div>
-    <button class="nb on" data-tab="session">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><line x1="6" y1="12" x2="18" y2="12"/><rect x="8" y="7" width="2" height="10" rx="1"/><rect x="14" y="7" width="2" height="10" rx="1"/></svg>
-      <span>Sesión</span>
-    </button>
     <button class="nb" data-tab="exercises">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <i class="ti ti-list nb-ico" aria-hidden="true"></i>
       <span>Ejercicios</span>
     </button>
     <button class="nb" data-tab="history">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2.5"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="7" y1="13.5" x2="10" y2="13.5"/><line x1="7" y1="17.5" x2="10" y2="17.5"/><line x1="14" y1="13.5" x2="17" y2="13.5"/><line x1="14" y1="17.5" x2="17" y2="17.5"/></svg>
+      <i class="ti ti-calendar nb-ico" aria-hidden="true"></i>
       <span>Historial</span>
     </button>
+    <button class="nb on" data-tab="session">
+      <i class="ti ti-barbell nb-ico" aria-hidden="true"></i>
+      <span>Sesión</span>
+    </button>
     <button class="nb" data-tab="progress">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,18 9,12 14,15 20,7"/><line x1="4" y1="22" x2="20" y2="22"/></svg>
+      <svg class="nb-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,18 9,12 14,15 20,7"/><line x1="4" y1="22" x2="20" y2="22"/></svg>
       <span>Progreso</span>
     </button>
     <button class="nb" data-tab="settings">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <i class="ti ti-settings nb-ico" aria-hidden="true"></i>
       <span>Ajustes</span>
     </button>
   </nav>
