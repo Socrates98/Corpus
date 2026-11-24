@@ -1285,7 +1285,7 @@ function showSubModal(xi){
 }
 function flushAndSave(){
   try{
-    document.querySelectorAll('[data-f]').forEach(inp=>{const xi=+inp.dataset.xi,si=+inp.dataset.si,f=inp.dataset.f;if(activeSession.exercises[xi]?.sets[si]!==undefined){const v=inp.value;activeSession.exercises[xi].sets[si][f]=f==='rir'?(v===''?null:parseInt(v)):parseFloat(v)||0;}});
+    document.querySelectorAll('input[data-f]').forEach(inp=>{const xi=+inp.dataset.xi,si=+inp.dataset.si,f=inp.dataset.f;if(activeSession.exercises[xi]?.sets[si]!==undefined){const v=inp.value;activeSession.exercises[xi].sets[si][f]=f==='rir'?(v===''?null:parseInt(v)):parseFloat(v)||0;}});
     activeSession.exercises.forEach((se,xi)=>{const inp=document.getElementById(`snotes-${xi}`);if(inp)se.notes=inp.value;});
     document.querySelectorAll('.cardio-t').forEach(inp=>{const xi=+inp.dataset.xi;if(activeSession.exercises[xi]?.sets[0]!==undefined)activeSession.exercises[xi].sets[0].time=parseInt(inp.value)||0;});
     const hasData=activeSession.exercises.some(se=>se.sets.some(s=>(s.weight||0)>0||(s.reps||0)>0||(s.time||0)>0));
