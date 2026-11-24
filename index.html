@@ -462,7 +462,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
         <!-- by exercise -->
         <div id="prog-ex-panel">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-            <select id="prog-sel" style="flex:1;min-width:140px;min-height:40px;font-size:.85rem;padding:7px 28px 7px 10px;"></select>
+            <button id="prog-ex-btn" style="flex:1;min-height:40px;font-size:.9rem;font-weight:600;background:var(--s2);border:1px solid var(--b);border-radius:var(--r8);padding:8px 12px;color:var(--t);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;"><span id="prog-ex-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button>
             <button class="btn btn-g btn-sm" id="btn-export-prog">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PDF
             </button>
@@ -486,6 +486,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:brightness(0) inver
           <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
             <select id="prog-rt-sel" style="flex:1;min-width:140px;min-height:40px;font-size:.85rem;padding:7px 28px 7px 10px;"></select>
             <select id="prog-day-sel" style="flex:1;min-width:120px;min-height:40px;font-size:.85rem;padding:7px 28px 7px 10px;"></select>
+            <button class="btn btn-g btn-sm" id="btn-export-rt-prog"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PDF</button>
           </div>
           <div id="prog-rt-charts"></div>
         </div>
@@ -855,7 +856,7 @@ box.addEventListener('touchcancel',()=>{act=false;box.style.transform='';box.sty
 })();
 
 /* ═══ 7. NAV ═══ */
-let curTab='session',exFilter='all',exSearch='',exSeg='ex-panel',progSeg='by-ex';
+let curTab='session',exFilter='all',exSearch='',exSeg='ex-panel',progSeg='by-ex',progExId=null;
 function movePill(tab){
   const btn=document.querySelector(`.nb[data-tab="${tab}"]`);
   const pill=document.getElementById('nav-pill');
@@ -1463,15 +1464,31 @@ document.getElementById('prog-seg').addEventListener('click',e=>{
   document.getElementById('prog-ex-panel').hidden=(seg!=='by-ex');
   document.getElementById('prog-rt-panel').hidden=(seg!=='by-routine');
   progSeg=seg;
-  if(seg==='by-ex')updateExCharts(document.getElementById('prog-sel').value);else renderProgressByRoutine();
+  if(seg==='by-ex'){if(progExId)updateExCharts(progExId);}else renderProgressByRoutine();
 });
 
+function setProgEx(exId){
+  const exercises=getEx()||DEFAULT_EX;const ex=exercises.find(e=>e.id===exId)||exercises[0];if(!ex)return;
+  progExId=ex.id;document.getElementById('prog-ex-name').textContent=ex.name;
+  updateExCharts(ex.id);updateVolChart(ex.id);
+}
+function showProgExPicker(){
+  const exercises=getEx()||DEFAULT_EX;let filtered=exercises;
+  const listHTML=()=>filtered.map(e=>`<div class="ex-pick" data-pex="${e.id}" style="padding:12px 4px;border-bottom:1px solid var(--b);cursor:pointer;"><div style="font-weight:600;font-size:.9rem;">${esc(e.name)}</div><div class="tsm tmut">${esc(e.group)}</div></div>`).join('');
+  openModal(`<div class="mh"><span class="mt">Seleccionar ejercicio</span><button class="ico-btn" id="mc-x">✕</button></div>
+    <input type="text" id="pex-q" placeholder="Buscar..." autocomplete="off" style="width:100%;background:var(--s2);border:1px solid var(--b);border-radius:var(--r8);padding:9px 12px;color:var(--t);font-size:.95rem;font-family:var(--fb);outline:none;margin-bottom:8px;">
+    <div id="pex-list" style="max-height:55vh;overflow-y:auto;">${listHTML()}</div>`);
+  document.getElementById('mc-x').onclick=closeModal;
+  setTimeout(()=>document.getElementById('pex-q')?.focus(),80);
+  document.getElementById('pex-q').addEventListener('input',e=>{const q=e.target.value.toLowerCase();filtered=exercises.filter(ex=>ex.name.toLowerCase().includes(q)||ex.group.toLowerCase().includes(q));document.getElementById('pex-list').innerHTML=listHTML();document.getElementById('pex-list').querySelectorAll('[data-pex]').forEach(el=>el.addEventListener('click',()=>{setProgEx(el.dataset.pex);closeModal();}));});
+  document.getElementById('pex-list').querySelectorAll('[data-pex]').forEach(el=>el.addEventListener('click',()=>{setProgEx(el.dataset.pex);closeModal();}));
+}
 function renderProgress(){
-  const exercises=getEx()||DEFAULT_EX;const sel=document.getElementById('prog-sel');const prev=sel.value;
-  sel.innerHTML=exercises.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('');
-  if(prev&&exercises.find(e=>e.id===prev))sel.value=prev;
-  sel.onchange=()=>{updateExCharts(sel.value);updateVolChart(sel.value);};
-  updateExCharts(sel.value);updateVolChart(sel.value);
+  const exercises=getEx()||DEFAULT_EX;
+  if(!progExId||!exercises.find(e=>e.id===progExId))progExId=exercises[0]?.id||null;
+  const btn=document.getElementById('prog-ex-btn');
+  btn.onclick=showProgExPicker;
+  if(progExId)setProgEx(progExId);
   if(progSeg==='by-routine')renderProgressByRoutine();
 }
 
@@ -1546,7 +1563,7 @@ document.getElementById('btn-export-rt').addEventListener('click',()=>{
 });
 
 document.getElementById('btn-export-prog').addEventListener('click',()=>{
-  const exId=document.getElementById('prog-sel').value;
+  const exId=progExId;
   try{
     const{jsPDF}=window.jspdf;const ex=getExById(exId);if(!ex)return;
     const doc=new jsPDF({unit:'mm',format:'a4'});const user=getUser()||'Usuario';
@@ -1561,6 +1578,27 @@ document.getElementById('btn-export-prog').addEventListener('click',()=>{
       const pts=getExHistory(exId);if(pts.length){const fy=doc.lastAutoTable.finalY+12;const maxW=Math.max(...pts.map(p=>p.mw));const maxRM=Math.max(...pts.map(p=>p.m1));doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(30,30,30);doc.text('Resumen de progresión',14,fy);doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(60,60,60);doc.text(`Peso máximo registrado: ${maxW} kg`,14,fy+8);doc.text(`1RM estimado máximo: ${maxRM.toFixed(1)} kg`,14,fy+15);doc.text(`Sesiones totales con este ejercicio: ${pts.length}`,14,fy+22);}
     }
     doc.save(`corpus-progreso-${ex.name.replace(/\s+/g,'-').toLowerCase()}-${today()}.pdf`);toast('PDF de progreso descargado','a');
+  }catch(e){console.error(e);toast('Error generando PDF','err');}
+});
+
+document.getElementById('btn-export-rt-prog').addEventListener('click',()=>{
+  const rtSel=document.getElementById('prog-rt-sel');const daySel=document.getElementById('prog-day-sel');
+  const routines=getRoutines();const r=routines.find(r=>r.id===rtSel.value);const d=r?.days.find(d=>d.id===daySel.value);
+  if(!d||!d.exerciseIds.length){toast('Sin ejercicios en este día','err');return;}
+  try{
+    const{jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});const user=getUser()||'Usuario';let y=20;
+    doc.setFont('helvetica','bold');doc.setFontSize(18);doc.setTextColor(30,30,30);doc.text('CORPUS — Progreso por rutina',14,y);y+=8;
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(100);doc.text(`${user} · ${r.name} · ${d.name} · ${new Date().toLocaleDateString('es-ES')}`,14,y);y+=12;
+    d.exerciseIds.forEach(exId=>{
+      const ex=getExById(exId);if(!ex)return;
+      const sessions=getSess();const rows=[];
+      sessions.slice().reverse().forEach(s=>{const se=s.exercises.find(e=>e.exerciseId===exId||e.exerciseName===ex.name);if(!se)return;se.sets.forEach((set,i)=>{rows.push([fmtShort(s.date),i+1,set.weight||0,set.reps||0,calc1RM(set.weight||0,set.reps||1).toFixed(1)]);});});
+      if(y>240){doc.addPage();y=20;}
+      doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(30,30,30);doc.text(ex.name,14,y);y+=6;
+      if(!rows.length){doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(120);doc.text('Sin datos',14,y);y+=8;}
+      else{doc.autoTable({startY:y,head:[['Fecha','Serie','Kg','Reps','1RM est.']],body:rows,theme:'grid',headStyles:{fillColor:[40,40,45],textColor:[201,247,49],fontStyle:'bold',fontSize:9},bodyStyles:{fontSize:9,textColor:[50,50,50]},alternateRowStyles:{fillColor:[245,245,247]},margin:{left:14,right:14},styles:{cellPadding:2.5,halign:'center'},columnStyles:{0:{halign:'left'}}});y=doc.lastAutoTable.finalY+10;}
+    });
+    doc.save(`corpus-rutina-${r.name.replace(/\s+/g,'-').toLowerCase()}-${d.name.replace(/\s+/g,'-').toLowerCase()}-${today()}.pdf`);toast('PDF descargado','a');
   }catch(e){console.error(e);toast('Error generando PDF','err');}
 });
 
