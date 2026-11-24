@@ -1470,8 +1470,8 @@ function renderProgress(){
   const exercises=getEx()||DEFAULT_EX;const sel=document.getElementById('prog-sel');const prev=sel.value;
   sel.innerHTML=exercises.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('');
   if(prev&&exercises.find(e=>e.id===prev))sel.value=prev;
-  sel.onchange=()=>updateExCharts(sel.value);
-  updateExCharts(sel.value);updateVolChart();
+  sel.onchange=()=>{updateExCharts(sel.value);updateVolChart(sel.value);};
+  updateExCharts(sel.value);updateVolChart(sel.value);
   if(progSeg==='by-routine')renderProgressByRoutine();
 }
 
@@ -1496,8 +1496,9 @@ function updateExCharts(exId){
   if(pts.length){ch1rmEmpty.hidden=true;ch1rmWrap.hidden=false;if(ch1)ch1.destroy();ch1=new Chart(document.getElementById('ch-1rm'),{type:'line',data:{labels:rLabels,datasets:[mk(rData,'#34d399')]},options:chBase});}
   else{ch1rmEmpty.hidden=false;ch1rmWrap.hidden=true;if(ch1){ch1.destroy();ch1=null;}}
 }
-function updateVolChart(){
-  const wMap={};getSess().forEach(s=>{const wk=weekKey(s.date);wMap[wk]=(wMap[wk]||0)+sessVol(s);});
+function updateVolChart(exId){
+  const ex=getExById(exId);const wMap={};
+  getSess().forEach(s=>{const se=s.exercises.find(e=>e.exerciseId===exId||e.exerciseName===ex?.name);if(!se)return;const wk=weekKey(s.date);const v=se.sets.reduce((a,st)=>a+(st.weight||0)*(st.reps||1),0);wMap[wk]=(wMap[wk]||0)+v;});
   const weeks=Object.keys(wMap).sort().slice(-12);const data=weeks.map(w=>Math.round(wMap[w]));
   if(chV)chV.destroy();
   chV=new Chart(document.getElementById('ch-vol'),{type:'bar',data:{labels:weeks.map(w=>fmtShort(w)),datasets:[{data,backgroundColor:'rgba(201,247,49,.28)',borderColor:'#c9f731',borderWidth:1.5,borderRadius:5}]},options:{...chBase,scales:{...chBase.scales,y:{...chBase.scales.y,beginAtZero:true}}}});
